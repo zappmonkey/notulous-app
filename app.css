@@ -1,0 +1,259 @@
+* {
+    box-sizing: border-box;
+    font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
+    outline: none;
+}
+
+body {
+    font-size: 11px;
+}
+
+.top {
+    user-select: none;
+    -webkit-app-region: drag;
+    height: 38px;
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+#menu .top {
+    border-bottom: none;
+}
+
+body #menu, body #list, body #workspace {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+body #menu {
+    color: #fff;
+    left: 0px;
+    width: 300px;
+    user-select: none;
+}
+
+.buttons {
+    float: right;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 6px;
+    color: #fff;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.button.active {
+    opacity: 1;
+}
+
+body #list {
+    left: 300px;
+    width: 300px;
+    background: #f9f9f9;
+    user-select: none;
+}
+
+body #list .content {
+    border-right: 1px solid #ddd;
+}
+
+body #workspace {
+    left: 600px;
+    right: 0;
+    background: #f9f9f9;
+}
+
+body #workspace .container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 30px;
+    overflow: auto;
+}
+
+body #workspace .status {
+    position: absolute;
+    height: 30px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+body #workspace .status .details {
+    color: #3a3a3a;
+    padding: 7px 12px;
+    display: inline-block;
+}
+
+body #workspace .status .buttons {
+    padding-right: 8px;
+}
+
+body #workspace .status .button {
+    color: #000;
+    padding: 7px;
+}
+
+body #menu .content, body #list .content, body #workspace .content {
+    position: absolute;
+    top: 38px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 5px 20px 7px 14px;
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+ul li.seperator {
+    padding: 0;
+    margin: 5px 12px;
+    background: rgba(255,255,255,0.2);
+    height: 0.5px;
+}
+
+ul li.active {
+    background: rgba(255,255,255,0.05);
+}
+
+ul li i {
+    margin-right: 14px;
+    color: rgba(255,255,255,0.5);
+}
+
+#list ul li.active {
+    background: rgba(0,0,0,0.05);
+}
+
+#list ul li i {
+    color: rgba(0,0,0,0.3);
+    margin-right: 10px;
+}
+
+#menu .resize, #list .resize {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    cursor: col-resize;
+    z-index: 10;
+}
+
+#menu .search, #list .search {
+    position: relative;
+}
+
+#menu .search input, #list .search input {
+    margin: 8px;
+    padding: 8px 8px 8px 30px;
+    border: none;
+    background: rgba(0,0,0,0.05);
+    width: calc(100% - 16px);
+    font-size: 11px;
+}
+
+#menu .search span, #list .search span {
+    position: absolute;
+    display: inline-block;
+    padding: 17px 20px;
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+}
+
+#list .search span {
+    color: rgba(0,0,0,0.5);
+}
+
+#menu .search input {
+    color: rgba(255,255,255,0.8);
+    background: rgba(0,0,0,0.2);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table tr td, table tr th {
+    max-width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 6px 10px;
+    border-bottom: 1px solid #ededed;
+    color: #666;
+    background: rgba(255,255,255,0.7);
+}
+
+table thead tr th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 8px 20px 10px 10px;
+    font-weight: 400;
+    text-align: left;
+    cursor: default;
+    user-select: none;
+    border-bottom: none;
+}
+
+table tr th:after {
+    content:'';
+    position:absolute;
+    left: 0;
+    bottom: 0;
+    width:100%;
+    border-bottom: 1px solid rgba(204, 204, 204, 0.65);
+}
+
+table tr th span {
+    font-size: 8px;
+    position: absolute;
+    top: 12px;
+    right: 5px;
+    padding: 0 10px 0 18px;
+    color: #a3acaf;
+    width: 10px;
+    display: inline-block;
+    opacity: 0;
+    transition: all 0.3s;
+    user-select: none;
+}
+
+table tr th:hover span.desc {
+    opacity: 1;
+}
+
+table tr th.desc span.desc, table tr th.asc span.asc {
+    opacity: 1;
+}
+table tr th.desc:hover span.asc, table tr th.asc:hover span.desc {
+    opacity: 1;
+}
+table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
+    opacity: 0;
+}

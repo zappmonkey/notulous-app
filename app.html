@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ZAPPWORK</title>
+        <link rel="stylesheet" href="app.css">
+    </head>
+    <body style="">
+        <div id="menu">
+            <div class="resize">
+            </div>
+            <div class="top">
+                <div class="buttons">
+                    <div class="button instances-but active"><i class="fas fa-server"></i></div>
+                    <div class="button databases-but"><i class="fas fa-database"></i></div>
+                </div>
+            </div>
+            <div class="content"></div>
+        </div>
+        <div id="list">
+            <div class="resize">
+            </div>
+            <div class="top"></div>
+            <div class="content"></div>
+        </div>
+        <div id="workspace">
+            <div class="top"></div>
+            <div class="content"></div>
+        </div>
+        <script type="text/javascript" src="zappwork.js"></script>
+        <script type="text/javascript" src="database.js"></script>
+        <script type="text/javascript" src="window.js"></script>
+    </body>
+</html>
+
+<script type="text/template" id="tpl-instances">
+    <div class="search">
+        <span><i class="fas fa-search"></i></span>
+        <input type="text" placeholder="filter"/>
+    </div>
+    <ul class="instances">
+    {{#each instances}}<li data-key="{{key}}"><i><i class="fas fa-server"></i></i>{{name}}</li>{{/each}}
+    </ul>
+</script>
+
+<script type="text/template" id="tpl-databases">
+    <div class="search">
+        <span><i class="fas fa-search"></i></span>
+        <input type="text" placeholder="filter"/>
+    </div>
+    <ul class="databases">
+    {{#each system}}<li><i><i class="fas fa-database"></i></i>{{this}}</li>{{/each}}
+    {{#if system}}<li class="seperator"></li>{{/if}}
+    {{#each user}}<li><i><i class="fas fa-database"></i></i>{{this}}</li>{{/each}}
+    </ul>
+</script>
+
+<script type="text/template" id="tpl-tables">
+    <div class="search">
+        <span><i class="fas fa-search"></i></span>
+        <input type="text" placeholder="filter"/>
+    </div>
+    <ul class="tables">
+    {{#each tables}}<li><i><i class="fas fa-table"></i></i>{{property this 'tables_in_' true true}}</li>{{/each}}
+    </ul>
+</script>
+
+<script type="text/template" id="tpl-table">
+    <div class="container">
+        <table class="table" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}">
+            <thead>
+                <tr>
+                    {{#each fields}}
+                    <th data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
+                        {{name}}
+                        <span class="asc"><i class="fas fa-chevron-up"></i></span>
+                        <span class="desc"><i class="fas fa-chevron-down"></i></span>
+                    </th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each records}}
+                <tr>{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    <div class="status">
+        <span class="details">
+         {{start}} - {{end}} of ~{{count}}
+        </span>
+        <div class="buttons">
+            {{#if previous}}<div class="button previous" data-page="{{previous}}"><i class="fas fa-chevron-left"></i></div>{{/if}}
+            {{#if next}}<div class="button next" data-page="{{next}}"><i class="fas fa-chevron-right"></i></div>{{/if}}
+        </div>
+    </div>
+</script>

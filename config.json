@@ -1,0 +1,28 @@
+{
+    "instances": {
+        "localhost": {
+            "name": "localhost",
+            "key": "localhost",
+            "type": "sql",
+            "host": "127.0.0.1",
+            "port": "3306",
+            "socket": false,
+            "username": "root",
+            "password": "noxs4u"
+        },
+        "zappmonkey": {
+            "name": "zappmonkey",
+            "key": "zappmonkey",
+            "type": "ssh+sql",
+            "host": "127.0.0.1",
+            "port": "3306",
+            "socket": false,
+            "username": "root",
+            "password": "freese1808",
+            "ssh_host": "185.10.49.115",
+            "ssh_username": "root",
+            "ssh_password": "freese1808",
+            "ssh_key": false
+        }
+    }
+}
