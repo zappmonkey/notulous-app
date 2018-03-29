@@ -1,11 +1,16 @@
 * {
     box-sizing: border-box;
-    font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
     outline: none;
 }
 
 body {
+    font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
     font-size: 11px;
+    -webkit-font-smoothing: antialiased;
+}
+
+input, select {
+    font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
 }
 
 .top {
@@ -41,6 +46,8 @@ body #menu {
 .button {
     display: inline-block;
     padding: 12px 6px;
+    width: 30px;
+    text-align: center;
     color: #fff;
     opacity: 0.5;
     transition: all 0.3s;
@@ -96,12 +103,19 @@ body #workspace .status .details {
     display: inline-block;
 }
 
-body #workspace .status .buttons {
+body #workspace .buttons {
     padding-right: 8px;
 }
 
-body #workspace .status .button {
+#workspace .top .buttons.database {
+    display: none;
+}
+
+body #workspace .button {
     color: #000;
+}
+
+body #workspace .status .button {
     padding: 7px;
 }
 
@@ -198,6 +212,10 @@ table {
     width: 100%;
 }
 
+table tr {
+    cursor: default;
+}
+
 table tr td, table tr th {
     max-width: 100px;
     overflow: hidden;
@@ -205,7 +223,7 @@ table tr td, table tr th {
     text-overflow: ellipsis;
     padding: 6px 10px;
     border-bottom: 1px solid #ededed;
-    color: #666;
+    color: #1a1a1a;
     background: rgba(255,255,255,0.7);
 }
 
@@ -233,7 +251,7 @@ table tr th:after {
 table tr th span {
     font-size: 8px;
     position: absolute;
-    top: 12px;
+    top: 10px;
     right: 5px;
     padding: 0 10px 0 18px;
     color: #a3acaf;
@@ -256,4 +274,27 @@ table tr th.desc:hover span.asc, table tr th.asc:hover span.desc {
 }
 table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
     opacity: 0;
+}
+
+#workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, #workspace .content .results {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+}
+
+body #workspace .content #editor, body #workspace .content .CodeMirror {
+    height: 50%;
+    width: 100%;
+    bottom: auto;
+    border: none;
+    background: none;
+}
+
+body #workspace .content .results {
+    border-top: 1px solid #ddd;
+    height: 50%;
+    top: auto;
 }

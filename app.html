@@ -4,6 +4,8 @@
         <meta charset="UTF-8">
         <title>ZAPPWORK</title>
         <link rel="stylesheet" href="app.css">
+        <link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="node_modules/codemirror/theme/tomorrow-night-bright.css">
     </head>
     <body style="">
         <div id="menu">
@@ -24,12 +26,23 @@
             <div class="content"></div>
         </div>
         <div id="workspace">
-            <div class="top"></div>
+            <div class="top">
+                <div class="buttons database">
+                    <div class="button wrench"><i class="fas fa-wrench"></i></div>
+                    <div class="button info"><i class="fas fa-info"></i></div>
+                    <div class="button table"><i class="fas fa-table"></i></div>
+                    <div class="button terminal"><i class="fas fa-terminal"></i></div>
+                    <div class="button archive"><i class="fas fa-archive"></i></div>
+                </div>
+            </div>
             <div class="content"></div>
         </div>
         <script type="text/javascript" src="zappwork.js"></script>
         <script type="text/javascript" src="database.js"></script>
         <script type="text/javascript" src="window.js"></script>
+        <script src="node_modules/codemirror/lib/codemirror.js"></script>
+        <script src="node_modules/codemirror/mode/sql/sql.js"></script>
+        <script src="node_modules/codemirror/keymap/sublime.js"></script>
     </body>
 </html>
 
@@ -66,6 +79,7 @@
 </script>
 
 <script type="text/template" id="tpl-table">
+<div class="table">
     <div class="container">
         <table class="table" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}">
             <thead>
@@ -95,4 +109,13 @@
             {{#if next}}<div class="button next" data-page="{{next}}"><i class="fas fa-chevron-right"></i></div>{{/if}}
         </div>
     </div>
+</div>
+</script>
+
+<script type="text/template" id="tpl-database-terminal">
+<div class="terminal">
+    <textarea id="editor"></textarea>
+    <div class="results">
+    </div>
+</div>
 </script>
