@@ -107,8 +107,12 @@ body #workspace .buttons {
     padding-right: 8px;
 }
 
-#workspace .top .buttons.database {
+#workspace .top .buttons {
     display: none;
+}
+
+#workspace .top .buttons.terminal {
+    float: left;
 }
 
 body #workspace .button {
@@ -292,6 +296,8 @@ body #workspace .content #editor, body #workspace .content .CodeMirror {
     border: none;
     background: none;
     overflow-x: hidden;
+    font-family: "Andale Mono", "Monaco", monospace;
+    font-size: 10px;
 }
 
 body #workspace .content .results {

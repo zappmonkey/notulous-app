@@ -2,28 +2,28 @@ const $ = require('jquery');
 const Handlebars = require('handlebars');
 const fs = require("fs");
 
-var zappwork = {};
+var notulous = {};
 
-zappwork.config = {
+notulous.config = {
     __config: undefined
 };
-zappwork.config.load = function() {
-    if (zappwork.config.__config == undefined) {
+notulous.config.load = function() {
+    if (notulous.config.__config == undefined) {
         var config = fs.readFileSync("./config.json");
-        zappwork.config.__config = JSON.parse(config);
+        notulous.config.__config = JSON.parse(config);
     }
-    return zappwork.config.__config;
+    return notulous.config.__config;
 };
-zappwork.config.instance = function(key) {
-    var config = zappwork.config.load();
+notulous.config.instance = function(key) {
+    var config = notulous.config.load();
     if (config.instances.hasOwnProperty(key)) {
         return config.instances[key];
     }
     return undefined;
 };
 
-zappwork.util = {};
-zappwork.util.empty = function(val) {
+notulous.util = {};
+notulous.util.empty = function(val) {
     switch (val) {
         case undefined:
         case null:
@@ -34,7 +34,7 @@ zappwork.util.empty = function(val) {
     }
     return false;
 }
-zappwork.util.fuzzyCompare = function(search, compare) {
+notulous.util.fuzzyCompare = function(search, compare) {
     if (compare == undefined || search == undefined) {
         return false;
     }
@@ -49,23 +49,23 @@ zappwork.util.fuzzyCompare = function(search, compare) {
     return compare.toLowerCase().match(regex);
 };
 
-zappwork.util.renderTpl = function(tpl, data) {
+notulous.util.renderTpl = function(tpl, data) {
     if (data == undefined) {
         data = {};
     }
     return Handlebars.compile($("#tpl-" + tpl).html())(data);
 };
 
-zappwork.storage = {};
-zappwork.storage.set = function(key, value) {
+notulous.storage = {};
+notulous.storage.set = function(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
 };
 
-zappwork.storage.unset = function(key) {
+notulous.storage.unset = function(key) {
     localStorage.removeItem(key);
 };
 
-zappwork.storage.get = function(key) {
+notulous.storage.get = function(key) {
     var i = localStorage.getItem(key);
     if (!i) {
         return undefined;
@@ -73,7 +73,7 @@ zappwork.storage.get = function(key) {
     return JSON.parse(i);
 };
 
-zappwork.storage.clear = function() {
+notulous.storage.clear = function() {
     localStorage.clear();
 };
 

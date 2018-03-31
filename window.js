@@ -16,8 +16,24 @@ function runQuery(query, callback) {
     if (window.mysql == undefined) {
 
     } else {
+        addToHistory(query);
         window.mysql.query(query, callback)
     }
+}
+
+function addToHistory(query) {
+    var history = notulous.storage.get('history');
+    if (!history) {
+        history = [];
+    }
+    history.unshift({
+        date: Date(),
+        query: query
+    });
+    if (history.length > 100) {
+        history.pop();
+    }
+    notulous.storage.set("history", history);
 }
 
 function getDatabases() {
@@ -44,13 +60,14 @@ function getDatabases() {
                 }
             }
         }
-        $("#menu .content").html(zappwork.util.renderTpl("databases", databases))
+        $("#menu .content").html(notulous.util.renderTpl("databases", databases))
     });
 };
 
 $(document).on('click',  '#list .tables li', function(e) {
     getTable($(this).text());
     $('#list .tables li.active').removeClass('active');
+    $("#workspace .top .buttons").not(".database").hide();
     $(this).addClass('active');
 });
 
@@ -63,13 +80,12 @@ function getTable(table, page, sort, order) {
         query += " ORDER BY " + sort + " " + order;
     }
     query += " LIMIT " + start + ", " + limit + ";";
-    console.log(query);
     runQuery(query , function (err, records, fields) {
         if (err) {
             throw err;
         }
         $("#workspace .content").html(
-            zappwork.util.renderTpl("table", {
+            notulous.util.renderTpl("table", {
                 fields: fields,
                 records: records,
                 table: table,
@@ -80,7 +96,7 @@ function getTable(table, page, sort, order) {
         ));
         $("#workspace .content table th").on("click", function() {
             var order = $(this).data("order");
-            if (zappwork.util.empty(order)) {
+            if (notulous.util.empty(order)) {
                 order = 'desc';
             }
             getTable($("#workspace .content table").data("table"), undefined, $(this).data("sort"), order);
@@ -127,7 +143,7 @@ function __getTable(data) {
                 data.next = data.page + 1;
             }
             data.start += 1;
-            var html = zappwork.util.renderTpl("table", data);
+            var html = notulous.util.renderTpl("table", data);
             $("#workspace .content > div").hide();
             if ($("#workspace .content .table").length > 0) {
                 $("#workspace .content .table").replaceWith(html);
@@ -137,7 +153,7 @@ function __getTable(data) {
             }
             $("#workspace .content .table th").on("click", function() {
                 var order = $(this).data("order");
-                if (zappwork.util.empty(order)) {
+                if (notulous.util.empty(order)) {
                     order = 'desc';
                 }
                 getTable($("#workspace .content .table").data("table"), undefined, $(this).data("sort"), order);
@@ -163,19 +179,19 @@ $(document).on('click',  '#menu .databases li', function(e) {
         if (err) {
             throw err;
         }
-        $("#list .content").html(zappwork.util.renderTpl("tables", {tables: results}))
+        $("#list .content").html(notulous.util.renderTpl("tables", {tables: results}))
     });
     $('#menu .databases li.active').removeClass('active');
     $(this).addClass('active');
 });
 
 $(document).on('click',  '#menu .top .button.instances-but', function(e) {
-    $("#menu .content").html(zappwork.util.renderTpl("instances", zappwork.config.load()));
+    $("#menu .content").html(notulous.util.renderTpl("instances", notulous.config.load()));
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.instances-but').addClass('active').show();
     $("#workspace .content").html("");
     $("#list .content").html("");
-    $("#workspace .top .buttons.database").hide();
+    $("#workspace .top .buttons").hide();
 });
 
 $(document).on('click',  '#menu .top .button.databases-but', function(e) {
@@ -183,7 +199,7 @@ $(document).on('click',  '#menu .top .button.databases-but', function(e) {
 });
 
 $(document).on('click',  '#menu .instances li', function(e) {
-    database.load(zappwork.config.instance($(this).data('key')), function(client) {
+    database.load(notulous.config.instance($(this).data('key')), function(client) {
         window.mysql = client;
         getDatabases();
     });
@@ -191,12 +207,13 @@ $(document).on('click',  '#menu .instances li', function(e) {
 
 $(document).on('click',  '#workspace .top .database .terminal', function(e) {
     $("#workspace .content > div").hide();
+    $("#workspace .top .buttons.terminal").show();
     if ($("#workspace .content .terminal").length > 0) {
         $("#workspace .content .terminal").show();
     } else {
-        var html = zappwork.util.renderTpl("database-terminal");
+        var html = notulous.util.renderTpl("database-terminal");
         $("#workspace .content").append(html);
-        var editor = CodeMirror.fromTextArea($("#workspace #editor")[0], {
+        window.editor = CodeMirror.fromTextArea($("#workspace #editor")[0], {
             mode: "text/x-mysql",
             // mode: "sql",
             keyMap: "sublime",
@@ -211,6 +228,32 @@ $(document).on('click',  '#workspace .top .database .terminal', function(e) {
     }
 });
 
+$(document).on('click',  '#workspace .top .buttons.terminal .run', function(e) {
+    var query = window.editor.getValue();
+    runQuery(query , function (err, records, fields) {
+        if (err) {
+            throw err;
+        }
+        $("#workspace .content .results").html(
+            notulous.util.renderTpl("table", {
+                fields: fields,
+                records: records,
+                // table: table,
+                // page: page,
+                // sort: sort,
+                // order: order
+            }
+        ));
+        // $("#workspace .content table th").on("click", function() {
+        //     var order = $(this).data("order");
+        //     if (notulous.util.empty(order)) {
+        //         order = 'desc';
+        //     }
+        //     getTable($("#workspace .content table").data("table"), undefined, $(this).data("sort"), order);
+        // });
+    });
+});
+
 $(document).on('mousedown',  '#menu .resize, #list .resize', function(e) {
     var container = $(this).parent();
     $("#workspace .container").hide();
@@ -221,7 +264,7 @@ $(document).on('mousedown',  '#menu .resize, #list .resize', function(e) {
             menu: $("#menu").width(),
             list: $("#list").width()
         };
-        zappwork.storage.set("window", sizes);
+        notulous.storage.set("window", sizes);
         $("#workspace .container").show();
     });
     $(document).on("mousemove", function(e) {
@@ -242,7 +285,7 @@ function resizeWindow() {
 $(document).on('keyup',  '#menu .search input, #list .search input', function(e) {
     var query = $(this).val();
     $(this).parent().parent().find("ul li").each(function() {
-        if (zappwork.util.fuzzyCompare(query, $(this).text())) {
+        if (notulous.util.fuzzyCompare(query, $(this).text())) {
             $(this).show();
         } else {
             $(this).hide();
@@ -251,8 +294,8 @@ $(document).on('keyup',  '#menu .search input, #list .search input', function(e)
 });
 
 $(document).ready(function() {
-    $("#menu .content").html(zappwork.util.renderTpl("instances", zappwork.config.load()));
-    var window = zappwork.storage.get("window");
+    $("#menu .content").html(notulous.util.renderTpl("instances", notulous.config.load()));
+    var window = notulous.storage.get("window");
     if (window) {
         $("#menu").width(window.menu);
         $("#list").width(window.list);
