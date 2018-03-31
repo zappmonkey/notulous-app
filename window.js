@@ -197,7 +197,7 @@ $(document).on('click',  '#workspace .top .database .terminal', function(e) {
         var html = zappwork.util.renderTpl("database-terminal");
         $("#workspace .content").append(html);
         var editor = CodeMirror.fromTextArea($("#workspace #editor")[0], {
-            mime: "x-sql",
+            mode: "text/x-mysql",
             // mode: "sql",
             keyMap: "sublime",
             // theme: "tomorrow-night-bright",

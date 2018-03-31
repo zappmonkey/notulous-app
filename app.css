@@ -287,10 +287,11 @@ table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
 
 body #workspace .content #editor, body #workspace .content .CodeMirror {
     height: 50%;
-    width: 100%;
+    /* width: 100%; */
     bottom: auto;
     border: none;
     background: none;
+    overflow-x: hidden;
 }
 
 body #workspace .content .results {
