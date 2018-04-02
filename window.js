@@ -227,26 +227,55 @@ $(document).on('click',  '#workspace .top .database .terminal', function(e) {
             matchBrackets : true,
             autofocus: true,
         });
+        var sizes = notulous.storage.get("terminal");
+        console.log(sizes);
+        if (sizes) {
+            $("#workspace .terminal .editor-container").height(sizes.editor),
+            $("#workspace .terminal .results").height(sizes.results)
+        };
     }
 });
 
 $(document).on('click',  '#workspace .top .buttons.terminal .run', function(e) {
-    runCustomQuery();
+    getAndRunCustomQuery();
 });
 
-function runCustomQuery(sort, order) {
-    var query = window.editor.getValue() + ";";
-    var re = /[\S\s]*?;/g;
-    var found = query.match(re);
-    if (found.length > 1) {
-        for (var key in found) {
-            console.log(found[key].trim());
-        }
+function getAndRunCustomQuery() {
+    var queries = getEditorQueries();
+    if (!queries) {
         return;
-    } else {
-        query = found[0];
+    } else if (queries.length == 1) {
+        runCustomQuery(queries[0]);
     }
+    var hasSelection = false;
+    if (window.editor.getSelection().trim().length > 4) {
+        hasSelection = true;
+    }
+    $("body").append(
+        notulous.util.renderTpl("queries-terminal", {queries: queries, hasSelection: hasSelection})
+    );
+    $("#modal ul li").on("click", function() {
+        switch ($(this).data("key")) {
+            case "selection":
+                runCustomQuery(window.editor.getSelection().trim());
+                break;
+            case "all":
+                for (var key in queries) {
+                    runCustomQuery(queries[key]);
+                }
+                break;
+            default:
+                runCustomQuery(queries[$(this).data("key")]);
+        }
+        $("#overlay .overlay-bg").trigger("click");
+    });
+    $("#overlay .overlay-bg").on("click", function() {
+        $("#overlay").remove();
+    });
+};
 
+var __lastCustomQuery;
+function runCustomQuery(query, sort, order) {
     if (sort && order) {
         // var originalQuery = query;
         var lcQuery = query.toLowerCase();
@@ -274,6 +303,7 @@ function runCustomQuery(sort, order) {
             query += " " + postQueryString;
         }
     }
+    __lastCustomQuery = query;
     runQuery({sql:query, typeCast:false} , function (err, records, fields) {
         if (err) {
             throw err;
@@ -291,10 +321,31 @@ function runCustomQuery(sort, order) {
             if (notulous.util.empty(order)) {
                 order = 'desc';
             }
-            runCustomQuery($(this).data("sort"), order);
+            runCustomQuery(__lastCustomQuery, $(this).data("sort"), order);
         });
     });
 }
+
+var customQueries;
+function getEditorQueries() {
+    var query = window.editor.getValue() + ";";
+    var re = /[\S\s]*?;/g;
+    var found = query.match(re);
+    var queries = [];
+    var q;
+    if (found.length == 0) {
+        return undefined;
+    }
+    for (var key in found) {
+        q = found[key].trim();
+        if (q.length <= 1 || q == ";") {
+            continue;
+        }
+        queries.push(q);
+    }
+    customQueries = (queries.length == 0) ? undefined : queries;
+    return customQueries;
+};
 
 $(document).on('mousedown',  '#menu .resize, #list .resize', function(e) {
     var container = $(this).parent();
@@ -316,6 +367,29 @@ $(document).on('mousedown',  '#menu .resize, #list .resize', function(e) {
         }
         container.width(width);
         resizeWindow();
+    });
+});
+
+$(document).on('mousedown',  '#workspace .terminal .resize', function(e) {
+    var container = $(this).parent();
+    $("#workspace .container").hide();
+    $(document).on("mouseup", function(e) {
+        $(document).off("mousemove");
+        $(document).off("mousup");
+        var sizes = {
+            editor: $("#workspace .terminal .editor-container").height(),
+            results: $("#workspace .terminal .results").height()
+        };
+        notulous.storage.set("terminal", sizes);
+        $("#workspace .container").show();
+    });
+    $(document).on("mousemove", function(e) {
+        var height = e.pageY - container.offset().top;
+        if (height < 200) {
+            height = 200;
+        }
+        container.height(height);
+        $("#workspace .terminal .results").height(container.parent().height() - container.height() - 1);
     });
 });
 

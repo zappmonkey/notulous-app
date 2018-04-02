@@ -117,8 +117,29 @@
 
 <script type="text/template" id="tpl-database-terminal">
 <div class="terminal">
-    <textarea id="editor"></textarea>
+    <div class="editor-container">
+        <textarea id="editor"></textarea>
+        <div class="resize"></div>
+    </div>
     <div class="results">
+    </div>
+</div>
+</script>
+
+<script type="text/template" id="tpl-queries-terminal">
+<div id="overlay">
+    <div class="overlay-bg"></div>
+    <div id="modal">
+        <div class="title">Select query to run</div>
+        <div class="content">
+            <ul>
+                {{#if hasSelection}}<li data-key="selection">Selection</li>{{/if}}
+                {{#each queries}}
+                <li data-key="{{@index}}">{{this}}</li>
+                {{/each}}
+                <li data-key="all">Run all</li>
+            </ul>
+        </div>
     </div>
 </div>
 </script>

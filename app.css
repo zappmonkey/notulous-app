@@ -280,7 +280,7 @@ table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
     opacity: 0;
 }
 
-#workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, #workspace .content .results {
+#workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, body #workspace .content .editor-container, #workspace .content .results {
     position: absolute;
     left: 0;
     top: 0;
@@ -289,19 +289,67 @@ table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
     overflow: auto;
 }
 
-body #workspace .content #editor, body #workspace .content .CodeMirror {
+body #workspace .content .editor-container {
     height: 50%;
-    /* width: 100%; */
     bottom: auto;
     border: none;
-    background: none;
+}
+
+body #workspace .content .editor-container .CodeMirror {
+    height: 100%;
     overflow-x: hidden;
+    background: none;
     font-family: "Andale Mono", "Monaco", monospace;
     font-size: 10px;
+
+}
+
+body #workspace .content .editor-container .resize {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    cursor: row-resize;
+    z-index: 5;
 }
 
 body #workspace .content .results {
     border-top: 1px solid #ddd;
     height: 50%;
     top: auto;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+#overlay .overlay-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.2);
+}
+
+#overlay #modal {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 400px;
+    background: #fff;
+}
+
+#overlay #modal .title {
+    background: #f9f9f9;
+    padding: 10px;
+    text-transform: uppercase;
 }
