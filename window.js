@@ -26,6 +26,9 @@ function addToHistory(query) {
     if (!history) {
         history = [];
     }
+    if (query instanceof Object) {
+        query = query.sql;
+    }
     history.unshift({
         date: Date(),
         query: query
@@ -128,7 +131,7 @@ function __getTable(data) {
             throw err;
         }
         data.count = records[0].Rows;
-        runQuery({sql:data.query, typeCast:false} , function (err, records, fields) {
+        runQuery({sql:data.query, typeCast:false}, function (err, records, fields) {
             if (err) {
                 throw err;
             }
@@ -164,7 +167,6 @@ function __getTable(data) {
             });
         });
     });
-
 };
 
 $(document).on("dblclick", ".top", function(e) {
@@ -229,8 +231,50 @@ $(document).on('click',  '#workspace .top .database .terminal', function(e) {
 });
 
 $(document).on('click',  '#workspace .top .buttons.terminal .run', function(e) {
-    var query = window.editor.getValue();
-    runQuery(query , function (err, records, fields) {
+    runCustomQuery();
+});
+
+function runCustomQuery(sort, order) {
+    var query = window.editor.getValue() + ";";
+    var re = /[\S\s]*?;/g;
+    var found = query.match(re);
+    if (found.length > 1) {
+        for (var key in found) {
+            console.log(found[key].trim());
+        }
+        return;
+    } else {
+        query = found[0];
+    }
+
+    if (sort && order) {
+        // var originalQuery = query;
+        var lcQuery = query.toLowerCase();
+        var baseQuery, postQueryString;
+        if (lcQuery.indexOf('order') !== -1) {
+            baseQuery = query.substring(0, lcQuery.indexOf('order'));
+        }
+        // determine if there is anything to put behind the sort
+        if (lcQuery.indexOf('limit') !== -1) {
+            postQueryString = query.substr(lcQuery.indexOf('limit'));
+            if (!baseQuery) {
+                baseQuery = query.substring(0, lcQuery.indexOf('limit'));
+            }
+        } else if (lcQuery.indexOf('having') !== -1) {
+            postQueryString = query.substr(lcQuery.indexOf('having'));
+            if (!baseQuery) {
+                baseQuery = query.substring(0, lcQuery.indexOf('having'));
+            }
+        }
+        if (baseQuery) {
+            query = baseQuery;
+        }
+        query += " ORDER BY " + sort + " " + order;
+        if (postQueryString) {
+            query += " " + postQueryString;
+        }
+    }
+    runQuery({sql:query, typeCast:false} , function (err, records, fields) {
         if (err) {
             throw err;
         }
@@ -238,21 +282,19 @@ $(document).on('click',  '#workspace .top .buttons.terminal .run', function(e) {
             notulous.util.renderTpl("table", {
                 fields: fields,
                 records: records,
-                // table: table,
-                // page: page,
-                // sort: sort,
-                // order: order
+                sort: sort,
+                order: order
             }
         ));
-        // $("#workspace .content table th").on("click", function() {
-        //     var order = $(this).data("order");
-        //     if (notulous.util.empty(order)) {
-        //         order = 'desc';
-        //     }
-        //     getTable($("#workspace .content table").data("table"), undefined, $(this).data("sort"), order);
-        // });
+        $("#workspace .content .results table th").on("click", function() {
+            var order = $(this).data("order");
+            if (notulous.util.empty(order)) {
+                order = 'desc';
+            }
+            runCustomQuery($(this).data("sort"), order);
+        });
     });
-});
+}
 
 $(document).on('mousedown',  '#menu .resize, #list .resize', function(e) {
     var container = $(this).parent();

@@ -105,7 +105,7 @@
     </div>
     <div class="status">
         <span class="details">
-         {{start}} - {{end}} of ~{{count}}
+        {{#if count}}{{start}} - {{end}} of ~{{count}}{{/if}}
         </span>
         <div class="buttons">
             {{#if previous}}<div class="button previous" data-page="{{previous}}"><i class="fas fa-chevron-left"></i></div>{{/if}}
