@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="node_modules/codemirror/theme/tomorrow-night-bright.css">
     </head>
     <body style="">
+        <div id="notifications"></div>
         <div id="menu">
             <div class="resize">
             </div>
@@ -133,13 +134,40 @@
         <div class="title">Select query to run</div>
         <div class="content">
             <ul>
-                {{#if hasSelection}}<li data-key="selection">Selection</li>{{/if}}
+                {{#if hasSelection}}<li data-key="selection"><p class="but">SELECTION</p></li>{{/if}}
                 {{#each queries}}
-                <li data-key="{{@index}}">{{this}}</li>
+                <li data-key="{{@index}}"><p>{{this}}</p></li>
                 {{/each}}
-                <li data-key="all">Run all</li>
+                <li data-key="all"><p class="but">RUN ALL</p></li>
             </ul>
         </div>
     </div>
+</div>
+</script>
+
+<script type="text/template" id="tpl-notification">
+<div class="notification {{type}}">
+    <div class="title">{{title}}</div>
+    <div class="content">{{content}}</div>
+</div>
+</script>
+
+<script type="text/template" id="tpl-archive">
+<div class="archive">
+    <table>
+        <thead><tr><th style="width:20%;">time</th><th>query</th><th style="width:80px;">actions</th></tr></thead>
+        <tbody>
+        {{#each archive}}
+        <tr>
+            <td>{{date}}</td>
+            <td class="query">{{query}}</td>
+            <td>
+                <i class="action-copy"><i class="fas fa-clipboard"></i></i>
+                <i class="action-terminal"><i class="fas fa-terminal"></i></i>
+            </td>
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
 </div>
 </script>
