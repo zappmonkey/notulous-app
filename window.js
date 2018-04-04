@@ -63,7 +63,8 @@ function getDatabases() {
                 }
             }
         }
-        $("#menu .content").html(notulous.util.renderTpl("databases", databases))
+        $("#menu .content").html(notulous.util.renderTpl("databases", databases));
+        $("#menu .content .search input").focus();
     });
 };
 
@@ -200,6 +201,7 @@ $(document).on('click',  '#menu .databases li', function(e) {
             return parseError(err);
         }
         $("#list .content").html(notulous.util.renderTpl("tables", {tables: results}))
+        $("#list .content .search input").focus();
     });
     $('#menu .databases li.active').removeClass('active');
     $(this).addClass('active');
@@ -436,23 +438,82 @@ function resizeWindow() {
     $("#workspace").css({left: $("#menu").width() + $("#list").width()});
 };
 
+$(document).on('keydown',  '#menu .search input, #list .search input', function(e) {
+    var handled = false;
+    var parent = $(this).closest(".content");
+    switch (e.keyCode) {
+        // enter
+        case 13:
+            handled = true;
+            var focussed = parent.find("li.focussed");
+            if (focussed && focussed.length == 1) {
+                focussed.removeClass("focussed");
+                focussed.trigger('click');
+            }
+            break;
+        // esc
+        case 27:
+            $(this).val("");
+            break;
+        // up
+        case 38:
+            handled = true;
+            var focussed = parent.find("li.focussed");
+            if (focussed && focussed.length == 1) {
+                var previous = focussed.prevAll('li:visible').not('.seperator').first();
+                focussed.removeClass('focussed');
+                if (previous.length == 1) {
+                    previous.addClass('focussed');
+                    ensureInView(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
+                    break;
+                }
+            }
+            parent.find("li:visible").last().addClass('focussed');
+            ensureInView(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
+            break;
+        // down
+        case 40:
+            handled = true;
+            var focussed = parent.find("li.focussed");
+            if (focussed && focussed.length == 1) {
+                var next = focussed.nextAll('li:visible').not('.seperator').first();
+                focussed.removeClass('focussed');
+                if (next.length == 1) {
+                    next.addClass('focussed');
+                    ensureInView(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
+                    break;
+                }
+            }
+            parent.find("li:visible").first().addClass('focussed');
+            ensureInView(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
+            break;
+    }
+    if (handled) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+
 $(document).on('keyup',  '#menu .search input, #list .search input', function(e) {
     var query = $(this).val();
-    $(this).parent().parent().find("ul li").each(function() {
+    var parent = $(this).closest(".content");
+    parent.find("ul li").each(function() {
         if (notulous.util.fuzzyCompare(query, $(this).text())) {
             $(this).show();
         } else {
             $(this).hide();
         }
     });
+    ensureInView(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
 });
 
 $(document).ready(function() {
     $("#menu .content").html(notulous.util.renderTpl("instances", notulous.config.load()));
-    var window = notulous.storage.get("window");
-    if (window) {
-        $("#menu").width(window.menu);
-        $("#list").width(window.list);
+    $("#menu .content .search input").focus();
+    var windowSizes = notulous.storage.get("window");
+    if (windowSizes) {
+        $("#menu").width(windowSizes.menu);
+        $("#list").width(windowSizes.list);
         resizeWindow();
     }
 });
@@ -463,4 +524,20 @@ function copyToClipboard(el) {
     $temp.val(el.text()).select();
     document.execCommand("copy");
     $temp.remove();
+};
+
+function ensureInView(container, element, offset) {
+    //Determine container top and bottom
+    let cTop = container.scrollTop();
+
+    //Determine element top and bottom
+    let eTop = element.offset().top - offset;
+    let eBottom = eTop + element.outerHeight() + 10;
+
+    //Check if out of view
+    if (eTop < 0) {
+        container.scrollTop(cTop + eTop);
+    } else if (eBottom > container.outerHeight()) {
+        container.scrollTop(cTop + (eBottom - container.outerHeight()));
+    }
 };

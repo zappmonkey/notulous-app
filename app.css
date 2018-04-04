@@ -157,6 +157,10 @@ ul li.active {
     background: rgba(255,255,255,0.05);
 }
 
+ul li.focussed {
+    background: rgba(255,255,255,0.1);
+}
+
 ul li i {
     margin-right: 14px;
     color: rgba(255,255,255,0.5);
@@ -164,6 +168,10 @@ ul li i {
 
 #list ul li.active {
     background: rgba(0,0,0,0.05);
+}
+
+#list ul li.focussed {
+    background: rgba(0,0,0,0.1);
 }
 
 #list ul li i {
