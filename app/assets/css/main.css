@@ -233,7 +233,7 @@ table tr td, table tr th {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 6px 10px;
+    padding: 5px 10px 7px;
     border-bottom: 1px solid #ededed;
     color: #1a1a1a;
     background: rgba(255,255,255,0.7);
@@ -249,6 +249,10 @@ table thead tr th {
     cursor: default;
     user-select: none;
     border-bottom: none;
+}
+
+table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.12);
 }
 
 table tr th:after {
@@ -357,6 +361,7 @@ body #workspace .content .results {
     border-radius: 3px;
     overflow: hidden;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+    max-height: calc(100% - 200px);
 }
 
 #overlay #modal .title {
@@ -392,6 +397,16 @@ body #workspace .content .results {
 }
 #overlay #modal .content ul li p.but {
     text-align: center;
+}
+
+#overlay #modal .content label {
+    display: block;
+    padding: 5px 20px;
+}
+
+#overlay #modal .content input, #overlay #modal .content textarea {
+    width: 100%;
+    max-width: 100%;
 }
 
 #notifications {

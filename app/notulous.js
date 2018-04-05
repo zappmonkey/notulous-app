@@ -142,8 +142,12 @@ Handlebars.registerHelper('filesize', function(size) {
 
 Handlebars.registerHelper('property', function(obj, property, startswith, caseinsensitive) {
     if (!startswith && !caseinsensitive) {
-        if (obj,hasOwnProperty(property)) {
-            return obj[property];
+        try {
+            if (obj[property]) {
+                return obj[property];
+            }
+        } catch (err) {
+            console.log(err);
         }
     } else {
         if (caseinsensitive) {
