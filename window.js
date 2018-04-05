@@ -527,6 +527,9 @@ function copyToClipboard(el) {
 };
 
 function ensureInView(container, element, offset) {
+    if (!container || !element || element == undefined || container == undefined || element.offset() == undefined) {
+        return;
+    }
     //Determine container top and bottom
     let cTop = container.scrollTop();
 
