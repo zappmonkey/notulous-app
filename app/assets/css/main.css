@@ -292,6 +292,20 @@ table tr th.desc:hover span.desc, table tr th.asc:hover span.asc {
     opacity: 0;
 }
 
+table tr td.actions, table tr th.actions {
+    width:80px;
+    text-align: right;
+}
+
+table tr td.actions i {
+    padding: 3px 5px;
+    opacity: 0.5;
+}
+
+table tr td.actions i:hover {
+    opacity: 1;
+}
+
 #workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, body #workspace .content .editor-container, #workspace .content .results {
     position: absolute;
     left: 0;

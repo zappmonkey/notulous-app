@@ -7,7 +7,7 @@ var app = {
 app.init = function() {
     app.view.restore();
     app.actions.init();
-    app.instances.get();
+    app.instance.get();
     app.search.init();
 };
 
@@ -16,8 +16,15 @@ app.error = function(err) {
     return err.message;
 }
 
-app.instances = {};
-app.instances.get = function() {
+app.instance = {
+    __selected: undefined
+};
+
+app.instance.getSelected = function() {
+    return app.instance.__selected;
+};
+
+app.instance.get = function() {
     $("#menu .content").html(
         notulous.util.renderTpl("instances", notulous.config.load())
     );
@@ -75,6 +82,10 @@ app.database.databases = function() {
         );
         app.actions.databases();
     });
+};
+
+app.database.getSelected = function () {
+    return app.database.__selected;
 };
 
 app.database.tables = function(database) {
@@ -292,6 +303,8 @@ app.history.add = function(query) {
     }
     history.unshift({
         date: Date(),
+        instance: app.instance.getSelected(),
+        database: app.database.getSelected(),
         query: query
     });
     if (history.length > app.history.maxLength) {
@@ -382,8 +395,10 @@ app.actions.tables = function() {
 
 app.actions.instances = function() {
     $('#menu .instances li').on('click', function(e) {
-        database.load(notulous.config.instance($(this).data('key')), function(client) {
+        var instance = $(this).data('key');
+        database.load(notulous.config.instance(instance), function(client) {
             app.__mysql = client;
+            app.instance.__selected = instance;
             app.database.databases();
         });
     });
@@ -392,6 +407,7 @@ app.actions.instances = function() {
 app.actions.workspace = function() {
     $('#workspace .top .database .archive').on('click', function(e) {
         $("#workspace .content > div").hide();
+        $("#workspace .top .buttons.terminal").hide();
 
         var history = notulous.storage.get("history");
         var html    = notulous.util.renderTpl("archive", {archive: history});
@@ -406,6 +422,19 @@ app.actions.workspace = function() {
         $("#workspace .content .archive .action-copy").on('click', function() {
             app.actions.copyToClipboard($(this).parent().parent().find(".query"));
         });
+
+        $("#workspace .content .archive .action-terminal").on('click', function() {
+            var query = $(this).parent().parent().find(".query").text();
+            console.log(query);
+            $('#workspace .top .database .terminal').trigger('click');
+            var editorQuery = app.__editor.getValue();
+            if (editorQuery != "") {
+                editorQuery += '\n';
+            }
+            app.__editor.setValue(editorQuery + query);
+            app.database.runCustomQuery(query);
+        });
+
     });
 };
 
@@ -415,7 +444,7 @@ app.actions.topMenus = function() {
     });
 
     $('#menu .top .button.instances-but').on('click', function(e) {
-        app.instances.get();
+        app.instance.get();
     });
 
     $('#menu .top .button.databases-but').on('click', function(e) {
