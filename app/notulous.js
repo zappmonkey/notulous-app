@@ -34,17 +34,21 @@ notulous.util.empty = function(val) {
     }
     return false;
 }
-notulous.util.fuzzyCompare = function(search, compare) {
+notulous.util.fuzzyCompare = function(search, compare, startWith) {
     if (compare == undefined || search == undefined) {
         return false;
     }
     var queries = search.split("|");
     var regex = "";
+    var first = ".*?";
+    if (startWith) {
+        first = "^";
+    }
     for (var key in queries) {
         if (regex != "") {
             regex += "|";
         }
-        regex += ".*?" + search.toLowerCase().replace(/-/g, "\\-").split("").join(".*?") + ".*?";
+        regex += first + queries[key].toLowerCase().replace(/-/g, "\\-").split("").join(".*?") + ".*?";
     }
     return compare.toLowerCase().match(regex);
 };

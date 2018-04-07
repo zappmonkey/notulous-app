@@ -160,7 +160,6 @@ app.database.__getTable = function(data) {
             });
             $("#workspace .content > .table tbody tr").on("click", function() {
                 var index = $(this).data('index');
-                console.log(app.database.__tableData.fields);
                 var data = {
                     record: app.database.__tableData.records[index],
                     fields: app.database.__tableData.fields
@@ -365,10 +364,19 @@ app.view.elementVisible = function(container, element, offset) {
     }
 };
 
-app.actions = {};
+app.actions = {
+    __timer: undefined
+};
 app.actions.init = function() {
     app.actions.workspace();
     app.actions.topMenus();
+    $(window).resize(function(){
+        $("#workspace .container").hide();
+        app.actions.__timer && clearTimeout(app.actions.__timer);
+        app.actions.__timer = setTimeout(function() {
+            $("#workspace .container").show();
+        }, 100);
+    });
 };
 
 app.actions.databases = function() {
@@ -601,7 +609,7 @@ app.search.init = function() {
         var query = $(this).val();
         var parent = $(this).closest(".content");
         parent.find("ul li").each(function() {
-            if (notulous.util.fuzzyCompare(query, $(this).text())) {
+            if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
                 $(this).show();
             } else {
                 $(this).hide();

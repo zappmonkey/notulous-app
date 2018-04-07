@@ -12,6 +12,24 @@ body {
 input, select {
     font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
 }
+button {
+    padding: 8px 20px;
+    background: none;
+    border: 1px solid #ccc;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 2px;
+    min-width: 100px;
+    margin: 0 10px;
+    color: #666;
+}
+
+.colored {
+    background: #a00;
+    border: 1px solid #a00;
+    color: #fff;
+}
 
 .top {
     user-select: none;
@@ -357,7 +375,7 @@ body #workspace .content .results {
 }
 
 #overlay .overlay-bg {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -366,16 +384,16 @@ body #workspace .content .results {
 }
 
 #overlay #modal {
-    position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translate(-50%, 0);
+    margin: 100px auto;
     width: 600px;
+    max-height: 400px;
+    max-height: calc(100% - 200px);
     background: #fff;
+    z-index: 110;
     border-radius: 3px;
+    position: relative;
     overflow: hidden;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
-    max-height: calc(100% - 200px);
 }
 
 #overlay #modal .title {
@@ -387,8 +405,12 @@ body #workspace .content .results {
 }
 
 #overlay #modal .content {
+    padding: 14px;
     overflow-y: auto;
+    overflow-x: hidden;
+    background: #fcfcfc;
 }
+
 #overlay #modal .content ul {
     padding: 5px 0;
 }
@@ -415,12 +437,33 @@ body #workspace .content .results {
 
 #overlay #modal .content label {
     display: block;
-    padding: 5px 20px;
+    padding: 5px 0;
+}
+
+#overlay #modal .content label span {
+    font-weight: bold;
+    margin: 0 0 7px;
+    display: inline-block;
+    color: #333;
+    padding: 0 0 0 4px;
+}
+
+#overlay #modal .content label input, #overlay #modal .content label textarea {
+    border: 1px solid #ccc;
+    padding: 5px;
+    background: #fff;
 }
 
 #overlay #modal .content input, #overlay #modal .content textarea {
     width: 100%;
     max-width: 100%;
+}
+
+#overlay #modal .actions {
+    padding: 12px 4px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
 }
 
 #notifications {
