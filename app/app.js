@@ -41,7 +41,8 @@ app.database = {
     __selected: undefined,
     __lastCustomQuery: undefined,
     __tableData: undefined,
-    __data: undefined
+    __data: undefined,
+    __columns: []
 };
 app.database.query = function(query, callback) {
     if (app.__mysql == undefined) {
@@ -56,7 +57,7 @@ app.database.databases = function() {
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.databases-but').addClass('active').show();
 
-    app.database.query('SHOW DATABASES', function (err, results, fields) {
+    app.database.query('SHOW DATABASES;', function (err, results, fields) {
         if (err) {
             return app.error(err);
         }
@@ -90,7 +91,7 @@ app.database.getSelected = function () {
 
 app.database.tables = function(database) {
     app.database.__selected = database;
-    app.database.query('USE `' + database + '`');
+    app.database.query('USE `' + database + '`;');
     app.database.query('SHOW TABLES;' , function (err, results, fields) {
         if (err) {
             return app.error(err);
@@ -103,6 +104,9 @@ app.database.tables = function(database) {
 };
 
 app.database.table = function(table, page, sort, order) {
+
+    app.database.tableColumns(table);
+
     var data = {
         table: table,
         sort: sort,
@@ -118,6 +122,22 @@ app.database.table = function(table, page, sort, order) {
     }
     data.query += " LIMIT " + data.start + ", " + data.limit + ";";
     app.database.__getTable(data);
+};
+
+app.database.refreshTable = function() {
+    app.database.__getTable(app.database.__tableData);
+};
+
+app.database.tableColumns = function(table, force) {
+    if (!force && app.database.__columns[table]) {
+        return app.database.__columns[table];
+    }
+    app.database.query('SHOW COLUMNS FROM `' + table + '`;' , function (err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        app.database.__columns[table] = results;
+    });
 };
 
 app.database.__getTable = function(data) {
@@ -160,15 +180,41 @@ app.database.__getTable = function(data) {
             });
             $("#workspace .content > .table tbody tr").on("click", function() {
                 var index = $(this).data('index');
+                var table = $("#workspace .content > .table table").data("table");
                 var data = {
-                    record: app.database.__tableData.records[index],
-                    fields: app.database.__tableData.fields
+                    maxheight: $(window).height()-250,
+                    table: table,
+                    columns: app.database.tableColumns(table),
+                    record: app.database.__tableData.records[index]
                 };
                 $("body").append(
                     notulous.util.renderTpl("record", data)
                 );
-                $("#overlay .overlay-bg").on("click", function() {
+                $("#overlay .overlay-bg, #modal .close").on("click", function() {
                     $("#overlay").remove();
+                });
+                $("#modal .save").on("click", function() {
+                    var key;
+                    var fields = [];
+                    $("#modal .fields input, #modal .fields textarea").each(function() {
+                        if ($(this).val() != $(this).data("value")) {
+                            fields.push('`' + $(this).data("field") + '` = "' + $(this).val() + '"');
+                        }
+                        if ($(this).hasClass("primary")) {
+                            key ='`' + $(this).data("field") + '` = "' + $(this).data("value") + '"';
+                        }
+                    });
+                    if (fields.length == 0) {
+                        return $("#overlay").remove();
+                    }
+                    var query = 'UPDATE `' + $("#modal .fields").data("table") + '` SET ' + fields.join(", ") + ' WHERE ' + key + ';';
+                    app.database.query({sql:query, typeCast:false}, function (err, records, fields) {
+                        if (err) {
+                            return app.error(err);
+                        }
+                        app.database.refreshTable();
+                        $("#overlay").remove();
+                    });
                 });
             });
             $("#workspace .content > .table .status .next, #workspace .content > .table .status .previous").on("click", function() {
@@ -433,7 +479,10 @@ app.actions.workspace = function() {
 
         $("#workspace .content .archive .action-terminal").on('click', function() {
             var query = $(this).parent().parent().find(".query").text();
-            console.log(query);
+            query = query.trim();
+            if (query.substr(-1) != ';') {
+                query += ';';
+            }
             $('#workspace .top .database .terminal').trigger('click');
             var editorQuery = app.__editor.getValue();
             if (editorQuery != "") {
@@ -472,7 +521,7 @@ app.actions.topMenus = function() {
                 mode: "text/x-mysql",
                 // mode: "sql",
                 keyMap: "sublime",
-                // theme: "tomorrow-night-bright",
+                theme: "monokai",
                 indentWithTabs: false,
                 lineWrapping: true,
                 lineNumbers: true,

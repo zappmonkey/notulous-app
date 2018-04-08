@@ -21,13 +21,13 @@ button {
     font-weight: bold;
     border-radius: 2px;
     min-width: 100px;
-    margin: 0 10px;
+    margin: 0 4px;
     color: #666;
 }
 
 .colored {
-    background: #a00;
-    border: 1px solid #a00;
+    background: #0a445d;
+    border: 1px solid #0a445d;
     color: #fff;
 }
 
@@ -269,7 +269,7 @@ table thead tr th {
     border-bottom: none;
 }
 
-table tbody tr:hover {
+table.clickable tbody tr:hover {
     background: rgba(0, 0, 0, 0.12);
 }
 
@@ -342,7 +342,6 @@ body #workspace .content .editor-container {
 body #workspace .content .editor-container .CodeMirror {
     height: 100%;
     overflow-x: hidden;
-    background: none;
     font-family: "Andale Mono", "Monaco", monospace;
     font-size: 10px;
     line-height: 14px;
@@ -409,6 +408,7 @@ body #workspace .content .results {
     overflow-y: auto;
     overflow-x: hidden;
     background: #fcfcfc;
+    max-height: calc(100% - 200px);
 }
 
 #overlay #modal .content ul {
@@ -459,11 +459,16 @@ body #workspace .content .results {
     max-width: 100%;
 }
 
+#overlay #modal .content textarea {
+    height: 100px;
+}
+
 #overlay #modal .actions {
-    padding: 12px 4px;
+    padding: 8px 10px 10px;
     background: #f9f9f9;
     border-top: 1px solid #ddd;
     background-color: #f9f9f9;
+    text-align: right;
 }
 
 #notifications {
@@ -472,7 +477,7 @@ body #workspace .content .results {
     top: 0;
     bottom: 0;
     overflow-y: scroll;
-    z-index: 8;
+    z-index: 1000;
 }
 
 #notifications .notification {

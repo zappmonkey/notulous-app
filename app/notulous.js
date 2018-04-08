@@ -173,3 +173,26 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
     }
     return null;
 });
+
+Handlebars.registerHelper('isInput', function(type, options) {
+    // console.log(type);
+    type = type.toLowerCase();
+    if (type.substr(0,3) == 'dec' || type.substr(0,3) == 'int' || type.substr(0,9) == 'mediumint') {
+        return options.fn(this);
+    }
+    if (type.substr(0,7) == 'varchar' && type.substring(8, type.length-1) < 257) {
+        return options.fn(this);
+    }
+    if (type.substr(0,4) == 'tiny' || type.substr(0,5) == 'small' || type.substr(0,5) == 'big') {
+        return options.fn(this);
+    }
+
+    switch (type) {
+        case 'date':
+        case 'datetime':
+        case 'time':
+        case 'year':
+            return options.fn(this);
+    }
+    return options.inverse(this);
+});
