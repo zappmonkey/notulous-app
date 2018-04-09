@@ -29,14 +29,17 @@
         <div id="workspace">
             <div class="top">
                 <div class="buttons database">
-                    <div class="button wrench"><i class="fas fa-wrench"></i></div>
-                    <div class="button info"><i class="fas fa-info"></i></div>
                     <div class="button table"><i class="fas fa-table"></i></div>
                     <div class="button terminal"><i class="fas fa-terminal"></i></div>
                     <div class="button archive"><i class="fas fa-archive"></i></div>
                 </div>
                 <div class="buttons terminal">
                     <div class="button run"><i class="fas fa-play fa-sm"></i></div>
+                </div>
+                <div class="buttons table">
+                    <div class="button filter"><i class="fas fa-filter"></i></div>
+                    <div class="button wrench"><i class="fas fa-wrench"></i></div>
+                    <div class="button info"><i class="fas fa-info"></i></div>
                 </div>
             </div>
             <div class="content"></div>
@@ -85,6 +88,8 @@
 
 <script type="text/template" id="tpl-table">
 <div class="table">
+    <div class="filters">
+    </div>
     <div class="container">
         <table class="table clickable" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}">
             <thead>
@@ -199,4 +204,29 @@
         </div>
     </div>
 </div>
+</script>
+
+<script type="text/template" id="tpl-filter">
+<form class="filter">
+    <div class="query">
+        <select name="field">
+            {{#each columns}}
+            <option value="{{Field}}" data-type="{{Type}}">{{Field}}</option>
+            {{/each}}
+        </select>
+
+        <select name="filter">
+            <option value="CONTAINS" >CONTAINS</option>
+            <option value="=" >=</option>
+            <option value="!=" >!=</option>
+            <option value="IS NULL" >IS NULL</option>
+            <option value="IS NOT NULL" >IS NOT NULL</option>
+        </select>
+
+        <input type="text" name="value"/>
+    </div>
+    <div class="actions">
+        <input type="submit" class="colored save" value="filter"/>
+    </div>
+</form>
 </script>

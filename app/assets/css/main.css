@@ -12,7 +12,7 @@ body {
 input, select {
     font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
 }
-button {
+button, input[type=submit] {
     padding: 8px 20px;
     background: none;
     border: 1px solid #ccc;
@@ -26,9 +26,9 @@ button {
 }
 
 .colored {
-    background: #0a445d;
-    border: 1px solid #0a445d;
-    color: #fff;
+    background: #257fe0!important;
+    border: 1px solid #257fe0!important;
+    color: #fff!important;
 }
 
 .top {
@@ -77,6 +77,7 @@ body #menu {
 
 .button.active {
     opacity: 1;
+    color: #257fe0;
 }
 
 body #list {
@@ -129,7 +130,7 @@ body #workspace .buttons {
     display: none;
 }
 
-#workspace .top .buttons.terminal {
+#workspace .top .buttons.terminal, #workspace .top .buttons.table {
     float: left;
 }
 
@@ -361,6 +362,25 @@ body #workspace .content .results {
     border-top: 1px solid #ddd;
     height: 50%;
     top: auto;
+}
+
+body #workspace .content .filters {
+    padding: 8px 10px;
+    overflow: hidden;
+    background: #fdfdfd;
+    display: none;
+}
+
+body #workspace .content .query {
+    float: left;
+}
+
+body #workspace .content .filters .actions {
+    float: right;
+}
+
+body #workspace .content .actions input[type=submit] {
+    padding: 2px 6px 3px;
 }
 
 #overlay {

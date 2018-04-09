@@ -103,17 +103,21 @@ app.database.tables = function(database) {
     });
 };
 
-app.database.table = function(table, page, sort, order) {
+app.database.table = function(table, page, sort, order, filter) {
 
     app.database.tableColumns(table);
 
     var data = {
         table: table,
+        filter: filter,
         sort: sort,
         order: order,
         limit: 1000,
         query: 'SELECT * FROM ' + table
     };
+    if (filter) {
+        data.query += " WHERE " + data.filter;
+    }
     data.page = page ? page : 1;
     data.start = data.page - 1;
     data.start = data.start * data.limit;
@@ -163,6 +167,12 @@ app.database.__getTable = function(data) {
             }
             data.start += 1;
             app.database.__tableData = data;
+            var filterHTML;
+            if ($("#workspace .content .filters").length > 0 && $("#workspace .content .filters").html().trim() != "") {
+                filterHTML = $("#workspace .content .filters").clone();
+                filterHTML.find("[name=field]").val($("#workspace .content .filters [name=field]").val());
+                filterHTML.find("[name=filter]").val($("#workspace .content .filters [name=filter]").val());
+            }
             var html = notulous.util.renderTpl("table", data);
             $("#workspace .content > div").hide();
             if ($("#workspace .content > .table").length > 0) {
@@ -171,12 +181,22 @@ app.database.__getTable = function(data) {
             } else {
                 $("#workspace .content").append(html);
             }
+            if (filterHTML) {
+                $("#workspace .content .filters").replaceWith(filterHTML);
+                app.actions.tableFilter();
+            }
             $("#workspace .content > .table th").on("click", function() {
                 var order = $(this).data("order");
                 if (notulous.util.empty(order)) {
                     order = 'desc';
                 }
-                app.database.table($("#workspace .content > .table table").data("table"), undefined, $(this).data("sort"), order);
+                app.database.table(
+                    $("#workspace .content > .table table").data("table"),
+                    undefined,
+                    $(this).data("sort"),
+                    order,
+                    app.database.__tableData.filter
+                );
             });
             $("#workspace .content > .table tbody tr").on("click", function() {
                 var index = $(this).data('index');
@@ -431,6 +451,7 @@ app.actions.databases = function() {
         app.database.tables($(this).text());
         $("#workspace .content > div").hide();
         $("#workspace .top .buttons.terminal").hide();
+        $("#workspace .top .buttons.table").hide();
         $("#workspace .top .buttons.database").show();
         $('#menu .databases li.active').removeClass('active');
         $(this).addClass('active');
@@ -443,7 +464,29 @@ app.actions.tables = function() {
         app.database.table($(this).text());
         $('#list .tables li.active').removeClass('active');
         $("#workspace .top .buttons").not(".database").hide();
+        $("#workspace .top .buttons.table").show();
         $(this).addClass('active');
+    });
+};
+
+app.actions.tableFilter = function() {
+    $("#workspace .content .container").css({top: $("#workspace .content .filters").outerHeight()});
+    $("#workspace .content .filters").show();
+    $("#workspace .content .filters").on('submit', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var query = app.convertToQuery(
+            $("#workspace .content .filters [name='field']").val(),
+            $("#workspace .content .filters [name='filter']").val(),
+            $("#workspace .content .filters [name='value']").val()
+        );
+        app.database.table(
+            $("#workspace .content table").data("table"),
+            undefined,
+            app.database.__tableData.sort,
+            app.database.__tableData.order,
+            query
+        );
     });
 };
 
@@ -462,6 +505,7 @@ app.actions.workspace = function() {
     $('#workspace .top .database .archive').on('click', function(e) {
         $("#workspace .content > div").hide();
         $("#workspace .top .buttons.terminal").hide();
+        $("#workspace .top .buttons.table").hide();
 
         var history = notulous.storage.get("history");
         var html    = notulous.util.renderTpl("archive", {archive: history});
@@ -491,7 +535,6 @@ app.actions.workspace = function() {
             app.__editor.setValue(editorQuery + query);
             app.database.runCustomQuery(query);
         });
-
     });
 };
 
@@ -511,6 +554,7 @@ app.actions.topMenus = function() {
     $('#workspace .top .database .terminal').on('click', function(e) {
         $("#workspace .content > div").hide();
         $("#workspace .top .buttons.terminal").show();
+        $("#workspace .top .buttons.table").hide();
         if ($("#workspace .content .terminal").length > 0) {
             $("#workspace .content .terminal").show();
         } else {
@@ -540,7 +584,23 @@ app.actions.topMenus = function() {
     $('#workspace .top .database .table').on('click', function(e) {
         $("#workspace .content > div").hide();
         $("#workspace .content > .table").show();
+        $("#workspace .top .buttons.table").show();
         $("#workspace .top .buttons.terminal").hide();
+    });
+
+    $('#workspace .top .buttons.table .filter').on('click', function(e) {
+        if ($("#workspace .content .filters").html().trim() != "") {
+            $("#workspace .content .filters").html("");
+            $("#workspace .content .container").css({top: 0});
+            $("#workspace .content .filters").hide();
+            return;
+        }
+        $("#workspace .content .filters").html(
+            notulous.util.renderTpl("filter", {
+                columns: app.database.tableColumns($("#workspace .content table").data("table"))
+            })
+        );
+        app.actions.tableFilter();
     });
 
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {
@@ -681,4 +741,23 @@ app.actions.copyToClipboard = function(el) {
     $temp.val(el.text()).select();
     document.execCommand("copy");
     $temp.remove();
+};
+
+app.convertToQuery = function(field, filter, value) {
+    var query = '`' + field + '` ';
+    switch (filter.toLowerCase()) {
+        case 'not contains':
+            query += 'NOT LIKE "%' + value + '%"';
+            break;
+        case 'contains':
+            query += 'LIKE "%' + value + '%"';
+            break;
+        case 'is null':
+        case 'is not null':
+            query += filter;
+            break;
+        default:
+            query += filter + ' "' + value + '"';
+    }
+    return query;
 };
