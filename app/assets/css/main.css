@@ -371,7 +371,7 @@ body #workspace .content .filters {
     display: none;
 }
 
-body #workspace .content .query {
+body #workspace .content .filters .query {
     float: left;
 }
 
