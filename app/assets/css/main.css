@@ -379,8 +379,42 @@ body #workspace .content .filters .actions {
     float: right;
 }
 
-body #workspace .content .actions input[type=submit] {
+body #workspace .content .filters .select {
+    display: inline-block;
+    position: relative;
+}
+
+body #workspace .content .filters .select select {
+    -webkit-appearance: none;
+    padding: 2px 18px 3px 6px;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background: none;
+    min-width: 140px;
+    position: relative;
+    z-index: 2;
+}
+
+body #workspace .content .filters .select i {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 5px;
+    display: inline-block;
+    font-size: 8px;
+    z-index: 1;
+}
+
+body #workspace .content input {
     padding: 2px 6px 3px;
+    border: 1px solid #aaa;
+}
+
+body #workspace .content .filters button.icon {
+    padding: 2px 4px;
+    width: auto;
+    min-width: auto;
+    border: none;
 }
 
 #overlay {

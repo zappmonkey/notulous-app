@@ -91,7 +91,7 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}">
+        <table class="table clickable" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}"  data-filter="{{filter}}">
             <thead>
                 <tr>
                     {{#each fields}}
@@ -209,23 +209,40 @@
 <script type="text/template" id="tpl-filter">
 <form class="filter">
     <div class="query">
-        <select name="field">
-            {{#each columns}}
-            <option value="{{Field}}" data-type="{{Type}}">{{Field}}</option>
-            {{/each}}
-        </select>
+        <div class="select">
+            <i><i class="fas fa-chevron-down"></i></i>
+            <select name="field">
+                {{#each columns}}
+                <option value="{{Field}}" data-type="{{Type}}">{{Field}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="select">
+            <i><i class="fas fa-chevron-down"></i></i>
+            <select name="filter">
+                <option value="CONTAINS">CONTAINS</option>
+                <option value="=">=</option>
+                <option value="!=">!=</option>
+                <option value="<"><</option>
+                <option value="<="><=</option>
+                <option value=">">></option>
+                <option value=">=">>=</option>
+                <option value="IS NULL" data-hidevalue="true">IS NULL</option>
+                <option value="IS NOT NULL" data-hidevalue="true">IS NOT NULL</option>
+                <option value="LIKE">LIKE</option>
+                <option value="NOT LIKE">NOT LIKE</option>
+                <option value="BETWEEN" data-showsecond="true">BETWEEN</option>
+                <option value="IN">IN</option>
+            </select>
+        </div>
 
-        <select name="filter">
-            <option value="CONTAINS" >CONTAINS</option>
-            <option value="=" >=</option>
-            <option value="!=" >!=</option>
-            <option value="IS NULL" >IS NULL</option>
-            <option value="IS NOT NULL" >IS NOT NULL</option>
-        </select>
-
-        <input type="text" name="value"/>
+        <input type="text" name="value1" placeholder="value"/>
+        <input type="text" name="value2"  placeholder="value2" style="display: none;"/>
     </div>
     <div class="actions">
+        <button class="icon clear" style="display:none;">
+            <i class="fas fa-trash"></i>
+        </button>
         <input type="submit" class="colored save" value="filter"/>
     </div>
 </form>

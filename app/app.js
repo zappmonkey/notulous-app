@@ -168,7 +168,7 @@ app.database.__getTable = function(data) {
             data.start += 1;
             app.database.__tableData = data;
             var filterHTML;
-            if ($("#workspace .content .filters").length > 0 && $("#workspace .content .filters").html().trim() != "") {
+            if (data.filter && $("#workspace .content .filters").length > 0 && $("#workspace .content .filters").html().trim() != "") {
                 filterHTML = $("#workspace .content .filters").clone();
                 filterHTML.find("[name=field]").val($("#workspace .content .filters [name=field]").val());
                 filterHTML.find("[name=filter]").val($("#workspace .content .filters [name=filter]").val());
@@ -185,6 +185,7 @@ app.database.__getTable = function(data) {
                 $("#workspace .content .filters").replaceWith(filterHTML);
                 app.actions.tableFilter();
             }
+            console.log("filters")
             $("#workspace .content > .table th").on("click", function() {
                 var order = $(this).data("order");
                 if (notulous.util.empty(order)) {
@@ -239,7 +240,7 @@ app.database.__getTable = function(data) {
             });
             $("#workspace .content > .table .status .next, #workspace .content > .table .status .previous").on("click", function() {
                 var table = $("#workspace .content > .table table");
-                app.database.table(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"));
+                app.database.table(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
             });
         });
     });
@@ -472,20 +473,42 @@ app.actions.tables = function() {
 app.actions.tableFilter = function() {
     $("#workspace .content .container").css({top: $("#workspace .content .filters").outerHeight()});
     $("#workspace .content .filters").show();
+    $("#workspace .content .filters [name='filter']").on('change', function(e) {
+        var selected = $(this).find(":selected");
+        if (selected.data('hidevalue')) {
+            $("#workspace .content .filters [name='value1']").hide();
+            $("#workspace .content .filters [name='value2']").hide();
+        } else {
+            $("#workspace .content .filters [name='value1']").show();
+            $("#workspace .content .filters [name='value2']").hide();
+        }
+        if (selected.data('showsecond')) {
+            $("#workspace .content .filters [name='value2']").show();
+        }
+    });
+    $("#workspace .content .filters button.clear").on('click', function(e) {
+        console.log(app.database.__tableData.filter);
+        app.database.__tableData.filter = undefined;
+        app.database.refreshTable();
+        console.log(app.database.__tableData.filter);
+    });
     $("#workspace .content .filters").on('submit', function(e) {
         e.stopPropagation();
         e.preventDefault();
-        var query = app.convertToQuery(
+        $("#workspace .content .filters button.clear").show();
+        var filter = app.convertToQuery(
             $("#workspace .content .filters [name='field']").val(),
             $("#workspace .content .filters [name='filter']").val(),
-            $("#workspace .content .filters [name='value']").val()
+            $("#workspace .content .filters [name='value1']").val(),
+            $("#workspace .content .filters [name='value2']").val()
         );
+        console.log(filter);
         app.database.table(
             $("#workspace .content table").data("table"),
             undefined,
             app.database.__tableData.sort,
             app.database.__tableData.order,
-            query
+            filter
         );
     });
 };
@@ -743,21 +766,27 @@ app.actions.copyToClipboard = function(el) {
     $temp.remove();
 };
 
-app.convertToQuery = function(field, filter, value) {
+app.convertToQuery = function(field, filter, value1, value2) {
     var query = '`' + field + '` ';
     switch (filter.toLowerCase()) {
         case 'not contains':
-            query += 'NOT LIKE "%' + value + '%"';
+            query += 'NOT LIKE "%' + value1 + '%"';
             break;
         case 'contains':
-            query += 'LIKE "%' + value + '%"';
+            query += 'LIKE "%' + value1 + '%"';
             break;
         case 'is null':
         case 'is not null':
             query += filter;
             break;
+        case 'between':
+            query += filter + ' "' + value1 + '" AND "' + value2 + '"';
+            break;
+        case 'in':
+            query += 'IN (' + value1 + ')';
+            break;
         default:
-            query += filter + ' "' + value + '"';
+            query += filter + ' "' + value1 + '"';
     }
     return query;
 };
