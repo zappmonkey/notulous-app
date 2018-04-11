@@ -1,7 +1,8 @@
 var app = {
     __con: undefined,
     __mysql: undefined,
-    __editor: undefined
+    __editor: undefined,
+    __config: undefined
 };
 
 app.init = function() {
@@ -17,7 +18,8 @@ app.error = function(err) {
 }
 
 app.instance = {
-    __selected: undefined
+    __selected: undefined,
+    __instances: undefined
 };
 
 app.instance.getSelected = function() {
@@ -26,7 +28,7 @@ app.instance.getSelected = function() {
 
 app.instance.get = function() {
     $("#menu .content").html(
-        notulous.util.renderTpl("instances", notulous.config.load())
+        notulous.util.renderTpl("instances", app.config())
     );
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.instances-but').addClass('active').show();
@@ -35,6 +37,13 @@ app.instance.get = function() {
     $("#workspace .top .buttons").hide();
     $("#menu .content .search input").focus();
     app.actions.instances();
+};
+
+app.config = function() {
+    if (!app.__config) {
+        app.__config = notulous.config.load();
+    }
+    return app.__config;
 };
 
 app.database = {
@@ -115,7 +124,7 @@ app.database.table = function(table, page, sort, order, filter) {
         limit: 1000,
         query: 'SELECT * FROM ' + table
     };
-    if (filter) {
+    if (data.filter) {
         data.query += " WHERE " + data.filter;
     }
     data.page = page ? page : 1;
@@ -168,12 +177,15 @@ app.database.__getTable = function(data) {
             data.start += 1;
             app.database.__tableData = data;
             var filterHTML;
-            if (data.filter && $("#workspace .content .filters").length > 0 && $("#workspace .content .filters").html().trim() != "") {
+            var filters = $("#workspace .content .filters").length;
+            var html = $("#workspace .content .filters").length > 0 ? $("#workspace .content .filters").html().trim() : undefined;
+            if (data.filter && filters > 0 && html != "") {
                 filterHTML = $("#workspace .content .filters").clone();
                 filterHTML.find("[name=field]").val($("#workspace .content .filters [name=field]").val());
                 filterHTML.find("[name=filter]").val($("#workspace .content .filters [name=filter]").val());
             }
-            var html = notulous.util.renderTpl("table", data);
+
+            html = notulous.util.renderTpl("table", data);
             $("#workspace .content > div").hide();
             if ($("#workspace .content > .table").length > 0) {
                 $("#workspace .content > .table").replaceWith(html);
@@ -185,7 +197,6 @@ app.database.__getTable = function(data) {
                 $("#workspace .content .filters").replaceWith(filterHTML);
                 app.actions.tableFilter();
             }
-            console.log("filters")
             $("#workspace .content > .table th").on("click", function() {
                 var order = $(this).data("order");
                 if (notulous.util.empty(order)) {
@@ -486,29 +497,26 @@ app.actions.tableFilter = function() {
             $("#workspace .content .filters [name='value2']").show();
         }
     });
-    $("#workspace .content .filters button.clear").on('click', function(e) {
-        console.log(app.database.__tableData.filter);
+    $("#workspace .content .filters a.clear").on('click', function(e) {
         app.database.__tableData.filter = undefined;
         app.database.refreshTable();
-        console.log(app.database.__tableData.filter);
     });
     $("#workspace .content .filters").on('submit', function(e) {
         e.stopPropagation();
         e.preventDefault();
-        $("#workspace .content .filters button.clear").show();
+        $("#workspace .content .filters a.clear").show();
         var filter = app.convertToQuery(
             $("#workspace .content .filters [name='field']").val(),
             $("#workspace .content .filters [name='filter']").val(),
             $("#workspace .content .filters [name='value1']").val(),
             $("#workspace .content .filters [name='value2']").val()
         );
-        console.log(filter);
         app.database.table(
             $("#workspace .content table").data("table"),
             undefined,
             app.database.__tableData.sort,
             app.database.__tableData.order,
-            filter
+            filter,
         );
     });
 };
@@ -680,6 +688,43 @@ app.actions.terminal = function() {
 };
 
 app.search = {};
+app.search.all = function() {
+    if ($("#search-all").length > 0) {
+        return $("#search-all").remove();
+    }
+    $("body").append(notulous.util.renderTpl("search-all"));
+    $("#search-all input").focus();
+    $("#search-all input").on('blur', function() {
+        $("#search-all").remove();
+    });
+    $('#search-all').on('keyup',  'input', function(e) {
+        var query = $(this).val();
+        if (query.length < 1) {
+            return;
+        }
+        console.log("-----------");
+        console.log("instances");
+        var instances = app.config()['instances'];
+        for (var key in instances) {
+            if (notulous.util.fuzzyCompare(query, key, true)) {
+                console.log(key, instances[key]);
+            }
+        }
+        console.log("databases");
+        $("#menu .content ul.databases li").each(function() {
+            if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
+                console.log($(this).text());
+            }
+        });
+        console.log("tables");
+        $("#list .content ul li").each(function() {
+            if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
+                console.log($(this).text());
+            }
+        });
+    });
+};
+
 app.search.init = function() {
     $('#menu, #list').on('keydown', '.search input', function(e) {
         var handled = false;
