@@ -438,6 +438,23 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
     border: 1px solid rgba(0,0,0,0.2);
 }
 
+#search-all ul {
+
+}
+
+#search-all ul li {
+    padding: 5px;
+}
+
+#search-all ul li.title {
+    font-weight: bold;
+}
+
+#search-all ul li.focussed {
+    background: #257fe0;
+    color: #fff;
+}
+
 #search-all ::-webkit-input-placeholder {
     color: rgba(0,0,0,0.5);
 }

@@ -499,7 +499,12 @@ app.actions.tableFilter = function() {
     });
     $("#workspace .content .filters a.clear").on('click', function(e) {
         app.database.__tableData.filter = undefined;
-        app.database.refreshTable();
+        app.database.table(
+            app.database.__tableData.table,
+            app.database.__tableData.page,
+            app.database.__tableData.sort,
+            app.database.__tableData.order
+        );
     });
     $("#workspace .content .filters").on('submit', function(e) {
         e.stopPropagation();
@@ -687,52 +692,128 @@ app.actions.terminal = function() {
     });
 };
 
-app.search = {};
+app.search = {
+    __allHandled: false
+};
 app.search.all = function() {
     if ($("#search-all").length > 0) {
         return $("#search-all").remove();
     }
     $("body").append(notulous.util.renderTpl("search-all"));
+
     $("#search-all input").focus();
     $("#search-all input").on('blur', function() {
         $("#search-all").remove();
     });
-    $('#search-all').on('keyup',  'input', function(e) {
+
+    $("#search-all input").on('keydown', function(e) {
+        app.search.__allHandled = false;
+        var list = $(this).parent().find("ul");
+        switch (e.keyCode) {
+            // enter
+            case 13:
+                app.search.__allHandled = true;
+                var focussed = list.find("li.focussed");
+                if (focussed && focussed.length == 1) {
+                    focussed.removeClass("focussed");
+                    focussed.trigger('click');
+                }
+                break;
+            // esc
+            case 27:
+                $(this).val("");
+                break;
+            // up
+            case 38:
+                app.search.__allHandled = true;
+                var focussed = list.find("li.focussed");
+                if (focussed && focussed.length == 1) {
+                    var previous = focussed.prevAll("li:not(.title)").first();
+                    focussed.removeClass('focussed');
+                    if (previous.length == 1) {
+                        previous.addClass('focussed');
+                        app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                        break;
+                    }
+                }
+                list.find("li:not(.title)").last().addClass('focussed');
+                // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                break;
+            // down
+            case 40:
+                app.search.__allHandled = true;
+                var focussed = list.find("li.focussed");
+                if (focussed && focussed.length == 1) {
+                    var next = focussed.nextAll("li:not(.title)").first();
+                    focussed.removeClass('focussed');
+                    if (next.length == 1) {
+                        next.addClass('focussed');
+                        // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                        break;
+                    }
+                }
+                list.find("li:not(.title)").first().addClass('focussed');
+                // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                break;
+        }
+        if (app.search.__allHandled) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+        }
+        return true;
+    });
+
+    $("#search-all input").on('keyup', function(e) {
+        if (app.search.__allHandled) {
+            return;
+        }
+        console.log('keyup');
         var query = $(this).val();
         if (query.length < 1) {
             return;
         }
-        console.log("-----------");
-        console.log("instances");
+        var data = {
+            commands: [],
+            instances: [],
+            databases: [],
+            tables: [],
+        };
         var instances = app.config()['instances'];
         for (var key in instances) {
             if (notulous.util.fuzzyCompare(query, key, true)) {
-                console.log(key, instances[key]);
+                data.instances.push(key);
             }
         }
-        console.log("databases");
         $("#menu .content ul.databases li").each(function() {
             if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
-                console.log($(this).text());
+                data.databases.push($(this).text());
             }
         });
-        console.log("tables");
         $("#list .content ul li").each(function() {
             if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
-                console.log($(this).text());
+                data.tables.push($(this).text());
             }
         });
+        $("#search-all .results").html(
+            notulous.util.renderTpl("search-all-results", data)
+        );
+    });
+
+    $("#search-all li:not(.title)").on('click', function(e) {
+
     });
 };
 
 app.search.init = function() {
     $('#menu, #list').on('keydown', '.search input', function(e) {
-        var handled = false;
+        app.search.__allHandled = false;
         var parent = $(this).closest(".content");
         switch (e.keyCode) {
             // enter
             case 13:
-                handled = true;
+                app.search.__allHandled = true;
                 var focussed = parent.find("li.focussed");
                 if (focussed && focussed.length == 1) {
                     focussed.removeClass("focussed");
@@ -745,7 +826,7 @@ app.search.init = function() {
                 break;
             // up
             case 38:
-                handled = true;
+                app.search.__allHandled = true;
                 var focussed = parent.find("li.focussed");
                 if (focussed && focussed.length == 1) {
                     var previous = focussed.prevAll('li:visible').not('.seperator').first();
@@ -761,7 +842,7 @@ app.search.init = function() {
                 break;
             // down
             case 40:
-                handled = true;
+                app.search.__allHandled = true;
                 var focussed = parent.find("li.focussed");
                 if (focussed && focussed.length == 1) {
                     var next = focussed.nextAll('li:visible').not('.seperator').first();
@@ -776,13 +857,17 @@ app.search.init = function() {
                 app.view.elementVisible(parent, parent.find("li.focussed"), parent.find(".search").outerHeight());
                 break;
         }
-        if (handled) {
+        if (app.search.__allHandled) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
         }
     });
 
     $('#menu, #list').on('keyup',  '.search input', function(e) {
+        if (app.search.__allHandled) {
+            return;
+        }
         var query = $(this).val();
         var parent = $(this).closest(".content");
         parent.find("ul li").each(function() {
