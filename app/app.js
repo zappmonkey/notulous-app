@@ -39,6 +39,20 @@ app.instance.get = function() {
     app.actions.instances();
 };
 
+app.instance.set = function(instance) {
+    database.load(notulous.config.instance(instance), function(client) {
+        app.__mysql = client;
+        app.instance.__selected = instance;
+        app.database.databases();
+    });
+    app.database.__selected = undefined;
+    $("#list .content").html("");
+    $("#workspace .content > div").hide();
+    $("#workspace .top .buttons.terminal").hide();
+    $("#workspace .top .buttons.table").hide();
+    $("#workspace .top .buttons.database").hide();
+};
+
 app.config = function() {
     if (!app.__config) {
         app.__config = notulous.config.load();
@@ -53,6 +67,17 @@ app.database = {
     __data: undefined,
     __columns: []
 };
+
+app.database.set = function(database) {
+    app.database.tables(database);
+    $("#workspace .content > div").hide();
+    $("#workspace .top .buttons.terminal").hide();
+    $("#workspace .top .buttons.table").hide();
+    $("#workspace .top .buttons.database").show();
+    $('#menu .databases li.active').removeClass('active');
+    $(this).addClass('active');
+};
+
 app.database.query = function(query, callback) {
     if (app.__mysql == undefined) {
 
@@ -460,13 +485,7 @@ app.actions.init = function() {
 app.actions.databases = function() {
     $("#menu .content .search input").focus();
     $('#menu .databases li').on('click', function(e) {
-        app.database.tables($(this).text());
-        $("#workspace .content > div").hide();
-        $("#workspace .top .buttons.terminal").hide();
-        $("#workspace .top .buttons.table").hide();
-        $("#workspace .top .buttons.database").show();
-        $('#menu .databases li.active').removeClass('active');
-        $(this).addClass('active');
+        app.database.set($(this).text());
     });
 };
 
@@ -528,12 +547,7 @@ app.actions.tableFilter = function() {
 
 app.actions.instances = function() {
     $('#menu .instances li').on('click', function(e) {
-        var instance = $(this).data('key');
-        database.load(notulous.config.instance(instance), function(client) {
-            app.__mysql = client;
-            app.instance.__selected = instance;
-            app.database.databases();
-        });
+        app.instance.set($(this).data('key'));
     });
 };
 
@@ -702,9 +716,9 @@ app.search.all = function() {
     $("body").append(notulous.util.renderTpl("search-all"));
 
     $("#search-all input").focus();
-    $("#search-all input").on('blur', function() {
-        $("#search-all").remove();
-    });
+    // $("#search-all input").on('blur', function() {
+    //     $("#search-all").remove();
+    // });
 
     $("#search-all input").on('keydown', function(e) {
         app.search.__allHandled = false;
@@ -716,12 +730,12 @@ app.search.all = function() {
                 var focussed = list.find("li.focussed");
                 if (focussed && focussed.length == 1) {
                     focussed.removeClass("focussed");
-                    focussed.trigger('click');
+                    focussed.trigger('mousedown');
                 }
                 break;
             // esc
             case 27:
-                $(this).val("");
+                $("#search-all").remove();
                 break;
             // up
             case 38:
@@ -769,9 +783,9 @@ app.search.all = function() {
         if (app.search.__allHandled) {
             return;
         }
-        console.log('keyup');
         var query = $(this).val();
         if (query.length < 1) {
+            $("#search-all .results").hide();
             return;
         }
         var data = {
@@ -780,29 +794,69 @@ app.search.all = function() {
             databases: [],
             tables: [],
         };
-        var instances = app.config()['instances'];
-        for (var key in instances) {
-            if (notulous.util.fuzzyCompare(query, key, true)) {
-                data.instances.push(key);
-            }
+        var hasResult = false;
+        if (query.substr(0,3) == "q: " && app.database.getSelected()) {
+            data.commands.push({
+                type: 'query',
+                data: query.substr(3)
+            });
+            hasResult = true;
         }
-        $("#menu .content ul.databases li").each(function() {
-            if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
-                data.databases.push($(this).text());
+        if (!hasResult) {
+            for (var key in app.config()['instances']) {
+                if (notulous.util.fuzzyCompare(query, key, true)) {
+                    hasResult = true;
+                    data.instances.push(key);
+                }
             }
-        });
-        $("#list .content ul li").each(function() {
-            if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
-                data.tables.push($(this).text());
-            }
-        });
-        $("#search-all .results").html(
-            notulous.util.renderTpl("search-all-results", data)
-        );
+            $("#menu .content ul.databases li").each(function() {
+                if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
+                    hasResult = true;
+                    data.databases.push($(this).text());
+                }
+            });
+            $("#list .content ul li").each(function() {
+                if (notulous.util.fuzzyCompare(query, $(this).text(), true)) {
+                    hasResult = true;
+                    data.tables.push($(this).text());
+                }
+            });
+        }
+        if (hasResult) {
+            $("#search-all .results").html(
+                notulous.util.renderTpl("search-all-results", data)
+            );
+            return $("#search-all .results").show();
+        }
+        $("#search-all .results").show();
     });
 
-    $("#search-all li:not(.title)").on('click', function(e) {
-
+    $("#search-all").on('mousedown', "li:not(.title)", function(e) {
+        switch ($(this).data("type")) {
+            case "query":
+                var query = $(this).data("value");
+                $('#workspace .top .database .terminal').trigger('click');
+                var editorQuery = app.__editor.getValue();
+                if (editorQuery != "") {
+                    editorQuery += '\n';
+                }
+                app.__editor.setValue(editorQuery + query);
+                app.database.runCustomQuery(query);
+                break;
+            case "command":
+                console.log("run command", $(this).data("value"));
+                break;
+            case "instance":
+                app.instance.set($(this).text());
+                break;
+            case "database":
+                app.database.set($(this).text());
+                break;
+            case "table":
+                app.database.table($(this).text());
+                break;
+        }
+        $("#search-all").remove();
     });
 };
 

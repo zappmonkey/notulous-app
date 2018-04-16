@@ -259,28 +259,28 @@
 <script type="text/template" id="tpl-search-all-results">
 <ul>
     {{#if commands }}
-    <li class="title">Commands</li>
+    <li class="title"><i class="fas fa-play fa-xs"></i>Commands</li>
     {{#each commands}}
-    <li data-type="command">{{this}}</li>
+    <li data-type="{{type}}" data-value="{{data}}">{{type}}: {{data}}</li>
     {{/each}}
     {{/if}}
 
     {{#if instances }}
-    <li class="title">Instances</li>
+    <li class="title"><i class="fas fa-server"></i>Instances</li>
     {{#each instances}}
     <li data-type="instance">{{this}}</li>
     {{/each}}
     {{/if}}
 
     {{#if databases }}
-    <li class="title">Database</li>
+    <li class="title"><i class="fas fa-database"></i>Database</li>
     {{#each databases}}
     <li data-type="database">{{this}}</li>
     {{/each}}
     {{/if}}
 
     {{#if tables }}
-    <li class="title">Table</li>
+    <li class="title"><i class="fas fa-table"></i>Table</li>
     {{#each tables}}
     <li data-type="table">{{this}}</li>
     {{/each}}

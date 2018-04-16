@@ -77,6 +77,28 @@ function createMenu() {
             // {role: 'zoomin'},
             // {role: 'zoomout'},
             {type: 'separator'},
+            {
+                label: 'Editor',
+                accelerator: 'CmdOrCtrl+E',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('editor');
+                }
+            },
+            {
+                label: 'Table',
+                accelerator: 'CmdOrCtrl+T',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table');
+                }
+            },
+            {
+                label: 'Archive',
+                accelerator: 'CmdOrCtrl+K',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('archive');
+                }
+            },
+            {type: 'separator'},
             {role: 'togglefullscreen'}
         ]
     },
@@ -88,6 +110,30 @@ function createMenu() {
                 accelerator: 'CmdOrCtrl+P',
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('search-all');
+                }
+            }
+        ]
+    },
+    {
+        label: 'Table',
+        submenu: [
+            {
+                label: 'Filter',
+                accelerator: 'CmdOrCtrl+F',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-filter');
+                }
+            }
+        ]
+    },
+    {
+        label: 'Database',
+        submenu: [
+            {
+                label: 'Run queries...',
+                accelerator: 'CmdOrCtrl+Alt+R',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('run-queries');
                 }
             }
         ]
