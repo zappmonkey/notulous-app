@@ -14,10 +14,23 @@ notulous.config.load = function() {
     }
     return notulous.config.__config;
 };
+
+notulous.config.save = function(config) {
+    fs.writeFile("./config.json", JSON.stringify(config), function(err) {
+        if(err) {
+            console.log(err);
+            throw "Unable to save configuration";
+        }
+        console.log("The file was saved!");
+        notulous.config.__config = config;
+    });
+    return notulous.config.__config;
+};
+
 notulous.config.instance = function(key) {
     var config = notulous.config.load();
     if (config.instances.hasOwnProperty(key)) {
-        return config.instances[key];
+        return JSON.parse(JSON.stringify(config.instances[key]));
     }
     return undefined;
 };

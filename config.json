@@ -1,28 +1,27 @@
 {
     "instances": {
-        "localhost": {
-            "name": "localhost",
-            "key": "localhost",
-            "type": "sql",
+        "127-0-0-1": {
+            "name": "127.0.0.1",
             "host": "127.0.0.1",
-            "port": "3306",
-            "socket": false,
             "username": "root",
-            "password": "noxs4u"
+            "password": "7101e456ffe3",
+            "port": 3306,
+            "key": "127-0-0-1",
+            "hash": "FW1HP4XhL8iy",
+            "type": "sql"
         },
-        "zappmonkey": {
-            "name": "zappmonkey",
-            "key": "zappmonkey",
-            "type": "ssh+sql",
+        "zappmonkey-encrypted": {
+            "name": "zappmonkey encrypted",
             "host": "127.0.0.1",
-            "port": "3306",
-            "socket": false,
             "username": "root",
-            "password": "freese1808",
+            "password": "c395357fb545ee522257",
+            "port": 3306,
             "ssh_host": "185.10.49.115",
             "ssh_username": "root",
             "ssh_password": "freese1808",
-            "ssh_key": false
+            "ssh_port": 22,
+            "key": "zappmonkey-encrypted",
+            "hash": "NPClJQI6ow1D"
         }
     }
 }

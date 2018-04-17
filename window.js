@@ -44,3 +44,25 @@ ipcRenderer.on('run-queries', function() {
         $("#workspace .buttons.terminal .run").trigger("click");
     }
 });
+
+ipcRenderer.on('add-instance', function() {
+    app.instance.add();
+});
+
+const {remote} = require('electron')
+const {Menu, MenuItem} = remote
+
+var item;
+const template = [{
+    label: 'Edit',
+    click: () => {
+        app.instance.edit(item.data("key"));
+    }
+}];
+const menu = Menu.buildFromTemplate(template);
+
+$(document).on('contextmenu', "#menu li", function(e) {
+    item = $(this);
+    e.preventDefault()
+    menu.popup(remote.getCurrentWindow())
+});

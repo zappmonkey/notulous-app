@@ -1,3 +1,7 @@
+var crypt = require('crypto'),
+    algorithm = 'aes-256-ctr',
+    password = 'd6F3Efeq';
+
 var app = {
     __con: undefined,
     __mysql: undefined,
@@ -17,6 +21,13 @@ app.error = function(err) {
     return err.message;
 }
 
+app.config = function() {
+    if (!app.__config) {
+        app.__config = notulous.config.load();
+    }
+    return app.__config;
+};
+
 app.instance = {
     __selected: undefined,
     __instances: undefined
@@ -24,6 +35,66 @@ app.instance = {
 
 app.instance.getSelected = function() {
     return app.instance.__selected;
+};
+
+app.instance.edit = function(instance) {
+    app.instance.add(notulous.config.instance(instance));
+};
+
+app.instance.add = function(instanceData) {
+    $("body").append(
+        notulous.util.renderTpl("instance-add", instanceData)
+    );
+    $("#overlay .overlay-bg, #modal .close").on("click", function() {
+        $("#overlay").remove();
+    });
+    $("#modal input[type=radio]").on("change", function() {
+        if ($(this).val() == "sql") {
+            $("#modal .content .ssh").hide();
+        } else {
+            $("#modal .content .ssh").show();
+        }
+    });
+    $("#modal .save").on("click", function() {
+        var data = {};
+        var save = true;
+        $("#modal input[type=text]:visible, #modal input[type=password]:visible").each(function() {
+            data[$(this).attr('name')] = $(this).val();
+            if (data[$(this).attr('name')] == "") {
+                data[$(this).attr('name')] = $(this).data("default");
+                if ($(this).attr('required')) {
+                    $(this).addClass('invalid');
+                    $(this).on("change", function() {
+                        $(this).removeClass('invalid');
+                        $(this).off();
+                    });
+                    save = false;
+                }
+            }
+        });
+        if (save) {
+            if (data.name == "" || data.name == undefined) {
+                data.name = data.host;
+            }
+            if (!data.hasOwnProperty("key")) {
+                data.key = app.urlify(data.name);
+            }
+            data.hash = app.hash();
+            data.password = app.encrypt(data.password, data.hash+data.key);
+            if (data.type == "ssh+sql") {
+                data.ssh_password = app.encrypt(data.ssh_password, data.hash+data.key);
+            }
+            var config = app.config();
+            config.instances[data.key] = data;
+            try {
+                app.__config = notulous.config.save(config);
+                $("#menu .top .instances").trigger("click");
+                $("#overlay .actions .close").trigger("click");
+            } catch(e) {
+                return app.error(err);
+            }
+        }
+    });
 };
 
 app.instance.get = function() {
@@ -40,24 +111,27 @@ app.instance.get = function() {
 };
 
 app.instance.set = function(instance) {
-    database.load(notulous.config.instance(instance), function(client) {
+    var data = notulous.config.instance(instance);
+    if (data.hash) {
+
+        data.password = app.decrypt(data.password, data.hash+data.key);
+        if (data.type == "ssh+sql" && !data.ssh_key) {
+            data.ssh_password = app.decrypt(data.ssh_password, data.hash+data.key);
+        }
+    }
+    database.load(data, function(client) {
         app.__mysql = client;
         app.instance.__selected = instance;
         app.database.databases();
     });
     app.database.__selected = undefined;
+    $('#menu .databases li.active').removeClass('active');
     $("#list .content").html("");
+    $("#list .top label").text("");
     $("#workspace .content > div").hide();
     $("#workspace .top .buttons.terminal").hide();
     $("#workspace .top .buttons.table").hide();
     $("#workspace .top .buttons.database").hide();
-};
-
-app.config = function() {
-    if (!app.__config) {
-        app.__config = notulous.config.load();
-    }
-    return app.__config;
 };
 
 app.database = {
@@ -70,6 +144,7 @@ app.database = {
 
 app.database.set = function(database) {
     app.database.tables(database);
+    $("#list .top label").html("<i class='fas fa-database'></i>" + database);
     $("#workspace .content > div").hide();
     $("#workspace .top .buttons.terminal").hide();
     $("#workspace .top .buttons.table").hide();
@@ -486,6 +561,8 @@ app.actions.databases = function() {
     $("#menu .content .search input").focus();
     $('#menu .databases li').on('click', function(e) {
         app.database.set($(this).text());
+        $('#menu .databases li.active').removeClass('active');
+        $(this).addClass('active');
     });
 };
 
@@ -948,6 +1025,40 @@ app.actions.copyToClipboard = function(el) {
     $temp.val(el.text()).select();
     document.execCommand("copy");
     $temp.remove();
+};
+
+app.hash = function(length) {
+    if (!length) {
+        length = 12;
+    }
+    var hash = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < length; i++) {
+        hash += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return hash;
+};
+
+app.urlify = function(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
+};
+
+
+app.encrypt = function(text, secret){
+    console.log(crypt);
+    var cipher = crypt.createCipher(algorithm, password+secret);
+    var crypted = cipher.update(text,'utf8','hex');
+    crypted += cipher.final('hex');
+    return crypted;
+};
+
+app.decrypt = function(text, secret){
+    var decipher = crypt.createDecipher(algorithm, password+secret);
+    var dec = decipher.update(text,'hex','utf8');
+    dec += decipher.final('utf8');
+    return dec;
 };
 
 app.convertToQuery = function(field, filter, value1, value2) {

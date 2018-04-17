@@ -25,6 +25,10 @@ button, input[type=submit] {
     color: #666;
 }
 
+.invalid {
+    border: 1px solid #900!important;
+}
+
 .colored {
     background: #257fe0!important;
     border: 1px solid #257fe0!important;
@@ -85,6 +89,20 @@ body #list {
     width: 300px;
     background: #f9f9f9;
     user-select: none;
+}
+
+body #list label {
+    display: inline-block;
+    line-height: 38px;
+    text-align: center;
+    color: #999;
+    text-shadow: 0 1px 1px #fff;
+}
+
+body #list label svg {
+    margin-right: 5px;
+    font-size: 0.8em;
+    opacity: 0.5;
 }
 
 body #list .content {
@@ -386,7 +404,7 @@ body #workspace .content .filters .select {
 
 body #workspace .content .filters .select select {
     -webkit-appearance: none;
-    padding: 2px 18px 3px 6px;
+    padding: 4px 28px 5px 8px;
     border: 1px solid #aaa;
     border-radius: 2px;
     background: none;
@@ -399,14 +417,15 @@ body #workspace .content .filters .select i {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 5px;
+    padding: 7px;
     display: inline-block;
     font-size: 8px;
     z-index: 1;
+    border-left: 1px solid #ddd;
 }
 
 body #workspace .content input {
-    padding: 2px 6px 3px;
+    padding: 4px 8px 5px;
     border: 1px solid #aaa;
 }
 
@@ -522,7 +541,7 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
 }
 
 #overlay #modal .content {
-    padding: 14px;
+    padding: 4px 14px 14px;
     overflow-y: auto;
     overflow-x: hidden;
     background: #fcfcfc;
@@ -568,7 +587,7 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
 
 #overlay #modal .content label input, #overlay #modal .content label textarea {
     border: 1px solid #ccc;
-    padding: 5px;
+    padding: 4px 10px 5px;
     background: #fff;
 }
 

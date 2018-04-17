@@ -23,7 +23,7 @@
         <div id="list">
             <div class="resize">
             </div>
-            <div class="top"></div>
+            <div class="top"><label></label></div>
             <div class="content"></div>
         </div>
         <div id="workspace">
@@ -286,4 +286,65 @@
     {{/each}}
     {{/if}}
 </ul>
+</script>
+
+<script type="text/template" id="tpl-instance-add">
+<div id="overlay">
+    <div class="overlay-bg"></div>
+    <div id="modal">
+        <div class="title">Add instance</div>
+        <div class="content">
+            <div class="mysql">
+                <input type="radio" name="type" value="sql" checked="checked"> MySQL
+                <input type="radio" name="type" value="ssh+sql">SSH + MySQL
+                <label>
+                    <span>Name</span>
+                    <input type="text" name="name" value="" placeholder="optional"/>
+                </label>
+                <label>
+                    <span>Host</span>
+                    <input type="text" name="host" value="" required="true"/>
+                </label>
+                <label>
+                    <span>User</span>
+                    <input type="text" name="username" value="" required="true"/>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" value=""/>
+                </label>
+                <label>
+                    <span>Database</span>
+                    <input type="text" name="database" value="" placeholder="optional"/>
+                </label>
+                <label>
+                    <span>Port</span>
+                    <input type="text" name="port" value="" placeholder="3306" data-default="3306"/>
+                </label>
+            </div>
+            <div class="ssh" style="display:none;">
+                <label>
+                    <span>SSH Host</span>
+                    <input type="text" name="ssh_host" value="" required="true"/>
+                </label>
+                <label>
+                    <span>SSH User</span>
+                    <input type="text" name="ssh_username" value="" required="true"/>
+                </label>
+                <label>
+                    <span>SSH Password</span>
+                    <input type="password" name="ssh_password" value="" placeholder="optional"/>
+                </label>
+                <label>
+                    <span>SSH Port</span>
+                    <input type="text" name="ssh_port" value="" placeholder="22" data-default="22"/>
+                </label>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="close">close</button>
+            <button class="colored save">save</button>
+        </div>
+    </div>
+</div>
 </script>
