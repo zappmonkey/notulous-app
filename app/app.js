@@ -43,7 +43,7 @@ app.instance.edit = function(instance) {
 
 app.instance.add = function(instanceData) {
     $("body").append(
-        notulous.util.renderTpl("instance-add", instanceData)
+        notulous.util.renderTpl("instance-add", {instance: instanceData})
     );
     $("#overlay .overlay-bg, #modal .close").on("click", function() {
         $("#overlay").remove();
@@ -55,10 +55,11 @@ app.instance.add = function(instanceData) {
             $("#modal .content .ssh").show();
         }
     });
+    $("#modal input[type=radio]").trigger("change");
     $("#modal .save").on("click", function() {
         var data = {};
         var save = true;
-        $("#modal input[type=text]:visible, #modal input[type=password]:visible").each(function() {
+        $("#modal input[type=hidden], #modal input[type=radio]:checked, #modal input[type=text]:visible, #modal input[type=password]:visible").each(function() {
             data[$(this).attr('name')] = $(this).val();
             if (data[$(this).attr('name')] == "") {
                 data[$(this).attr('name')] = $(this).data("default");
@@ -80,11 +81,21 @@ app.instance.add = function(instanceData) {
                 data.key = app.urlify(data.name);
             }
             data.hash = app.hash();
-            data.password = app.encrypt(data.password, data.hash+data.key);
-            if (data.type == "ssh+sql") {
+            if (data.hasOwnProperty("password") && !notulous.util.empty(data.password)) {
+                data.password = app.encrypt(data.password, data.hash+data.key);
+            }
+            if (data.type == "ssh+sql" && data.hasOwnProperty("ssh_password") && !notulous.util.empty(data.ssh_password)) {
                 data.ssh_password = app.encrypt(data.ssh_password, data.hash+data.key);
             }
             var config = app.config();
+            if (config.instances[data.key]) {
+                if (data.hasOwnProperty("password") && notulous.util.empty(data.password)) {
+                    data.password = config.instances[data.key].password;
+                }
+                if (data.hasOwnProperty("ssh_password") && notulous.util.empty(data.ssh_password)) {
+                    data.ssh_password = config.instances[data.key].ssh_password;
+                }
+            }
             config.instances[data.key] = data;
             try {
                 app.__config = notulous.config.save(config);
@@ -104,6 +115,7 @@ app.instance.get = function() {
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.instances-but').addClass('active').show();
     $("#workspace .content").html("");
+    $("#list .top label").html("");
     $("#list .content").html("");
     $("#workspace .top .buttons").hide();
     $("#menu .content .search input").focus();
@@ -113,7 +125,6 @@ app.instance.get = function() {
 app.instance.set = function(instance) {
     var data = notulous.config.instance(instance);
     if (data.hash) {
-
         data.password = app.decrypt(data.password, data.hash+data.key);
         if (data.type == "ssh+sql" && !data.ssh_key) {
             data.ssh_password = app.decrypt(data.ssh_password, data.hash+data.key);
@@ -127,7 +138,7 @@ app.instance.set = function(instance) {
     app.database.__selected = undefined;
     $('#menu .databases li.active').removeClass('active');
     $("#list .content").html("");
-    $("#list .top label").text("");
+    $("#list .top label").html("");
     $("#workspace .content > div").hide();
     $("#workspace .top .buttons.terminal").hide();
     $("#workspace .top .buttons.table").hide();

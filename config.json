@@ -11,17 +11,18 @@
             "type": "sql"
         },
         "zappmonkey-encrypted": {
+            "key": "zappmonkey-encrypted",
+            "type": "ssh+sql",
             "name": "zappmonkey encrypted",
             "host": "127.0.0.1",
             "username": "root",
-            "password": "c395357fb545ee522257",
-            "port": 3306,
+            "password": "b563f88c54923a2b1cb2",
+            "port": "3306",
             "ssh_host": "185.10.49.115",
             "ssh_username": "root",
-            "ssh_password": "freese1808",
-            "ssh_port": 22,
-            "key": "zappmonkey-encrypted",
-            "hash": "NPClJQI6ow1D"
+            "ssh_password": "b563f88c54923a2b1cb2",
+            "ssh_port": "22",
+            "hash": "Rydco0BR1uJc"
         }
     }
 }

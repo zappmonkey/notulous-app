@@ -25,6 +25,29 @@ button, input[type=submit] {
     color: #666;
 }
 
+input[type=radio] {
+    display: inline-block;
+    margin-right: 5px;
+    width: auto!important;
+}
+
+.row {
+    overflow: hidden;
+    padding: 5px;
+}
+
+.w2 {
+    width: 50%;
+    float: left;
+    display: inline-block!important;
+}
+
+.w3 {
+    width: 33%;
+    float: left;
+    display: inline-block!important;
+}
+
 .invalid {
     border: 1px solid #900!important;
 }

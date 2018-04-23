@@ -295,19 +295,26 @@
         <div class="title">Add instance</div>
         <div class="content">
             <div class="mysql">
-                <input type="radio" name="type" value="sql" checked="checked"> MySQL
-                <input type="radio" name="type" value="ssh+sql">SSH + MySQL
+                <input type="hidden" name="key" value="{{instance.key}}"/>
+                <div class="row">
+                    <label class="w3">
+                        <input type="radio" name="type" value="sql"{{#if instance}}{{#ifEq instance.type "sql"}} checked="checked"{{/ifEq}}{{else}} checked="checked"{{/if}}/> MySQL
+                    </label>
+                    <label class="w3">
+                        <input type="radio" name="type" value="ssh+sql"{{#ifEq instance.type "ssh+sql"}} checked="checked"{{/ifEq}}/>SSH + MySQL
+                    </label>
+                </div>
                 <label>
                     <span>Name</span>
-                    <input type="text" name="name" value="" placeholder="optional"/>
+                    <input type="text" name="name" value="{{instance.name}}" placeholder="optional"/>
                 </label>
                 <label>
                     <span>Host</span>
-                    <input type="text" name="host" value="" required="true"/>
+                    <input type="text" name="host" value="{{instance.host}}" required="true"/>
                 </label>
                 <label>
                     <span>User</span>
-                    <input type="text" name="username" value="" required="true"/>
+                    <input type="text" name="username" value="{{instance.username}}" required="true"/>
                 </label>
                 <label>
                     <span>Password</span>
@@ -315,21 +322,21 @@
                 </label>
                 <label>
                     <span>Database</span>
-                    <input type="text" name="database" value="" placeholder="optional"/>
+                    <input type="text" name="database" value="{{instance.database}}" placeholder="optional"/>
                 </label>
                 <label>
                     <span>Port</span>
-                    <input type="text" name="port" value="" placeholder="3306" data-default="3306"/>
+                    <input type="text" name="port" value="{{instance.port}}" placeholder="3306" data-default="3306"/>
                 </label>
             </div>
             <div class="ssh" style="display:none;">
                 <label>
                     <span>SSH Host</span>
-                    <input type="text" name="ssh_host" value="" required="true"/>
+                    <input type="text" name="ssh_host" value="{{instance.ssh_host}}" required="true"/>
                 </label>
                 <label>
                     <span>SSH User</span>
-                    <input type="text" name="ssh_username" value="" required="true"/>
+                    <input type="text" name="ssh_username" value="{{instance.ssh_username}}" required="true"/>
                 </label>
                 <label>
                     <span>SSH Password</span>
@@ -337,7 +344,7 @@
                 </label>
                 <label>
                     <span>SSH Port</span>
-                    <input type="text" name="ssh_port" value="" placeholder="22" data-default="22"/>
+                    <input type="text" name="ssh_port" value="{{instance.ssh_port}}" placeholder="22" data-default="22"/>
                 </label>
             </div>
         </div>
