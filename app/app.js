@@ -37,8 +37,37 @@ app.instance.getSelected = function() {
     return app.instance.__selected;
 };
 
+app.instance.remove = function(instance) {
+    var config = app.config();
+    if (config.instances[instance]) {
+        config.instances[instance] = undefined;
+    }
+    try {
+        app.__config = config;
+        notulous.config.save(app.__config);
+        $("#menu .top .instances").trigger("click");
+        app.instance.get();
+    } catch(e) {
+        return app.error(err);
+    }
+};
+
 app.instance.edit = function(instance) {
     app.instance.add(notulous.config.instance(instance));
+};
+
+app.instance.duplicate = function(instance) {
+    var instance = JSON.parse(JSON.stringify(notulous.config.instance(instance)));
+    instance.name += " (duplicate)";
+    if (instance.hash) {
+        instance.password = app.decrypt(instance.password, instance.hash+instance.key);
+        if (instance.type == "ssh+sql" && instance.ssh_password) {
+            instance.ssh_password = app.decrypt(instance.ssh_password, instance.hash+instance.key);
+        }
+    }
+    instance.key = undefined;
+    instance.hash = undefined;
+    app.instance.add(instance);
 };
 
 app.instance.add = function(instanceData) {
@@ -55,7 +84,13 @@ app.instance.add = function(instanceData) {
             $("#modal .content .ssh").show();
         }
     });
-    $("#modal input[type=radio]").trigger("change");
+
+    if (!instanceData || instanceData.type == "sql") {
+        $("#modal .content .ssh").hide();
+    } else {
+        $("#modal .content .ssh").show();
+    }
+
     $("#modal .save").on("click", function() {
         var data = {};
         var save = true;
@@ -74,20 +109,23 @@ app.instance.add = function(instanceData) {
             }
         });
         if (save) {
-            if (data.name == "" || data.name == undefined) {
+            var config = app.config();
+            if (notulous.util.empty(data.name)) {
                 data.name = data.host;
             }
-            if (!data.hasOwnProperty("key")) {
+            if (notulous.util.empty(data.key)) {
                 data.key = app.urlify(data.name);
+                if (config.instances[data.key]) {
+                    data.key = app.hash() + "_" + data.key;
+                }
+                data.hash = app.hash();
             }
-            data.hash = app.hash();
             if (data.hasOwnProperty("password") && !notulous.util.empty(data.password)) {
                 data.password = app.encrypt(data.password, data.hash+data.key);
             }
             if (data.type == "ssh+sql" && data.hasOwnProperty("ssh_password") && !notulous.util.empty(data.ssh_password)) {
                 data.ssh_password = app.encrypt(data.ssh_password, data.hash+data.key);
             }
-            var config = app.config();
             if (config.instances[data.key]) {
                 if (data.hasOwnProperty("password") && notulous.util.empty(data.password)) {
                     data.password = config.instances[data.key].password;
@@ -98,9 +136,11 @@ app.instance.add = function(instanceData) {
             }
             config.instances[data.key] = data;
             try {
-                app.__config = notulous.config.save(config);
+                app.__config = config;
+                notulous.config.save(app.__config);
                 $("#menu .top .instances").trigger("click");
                 $("#overlay .actions .close").trigger("click");
+                app.instance.get();
             } catch(e) {
                 return app.error(err);
             }
@@ -126,15 +166,11 @@ app.instance.set = function(instance) {
     var data = notulous.config.instance(instance);
     if (data.hash) {
         data.password = app.decrypt(data.password, data.hash+data.key);
-        if (data.type == "ssh+sql" && !data.ssh_key) {
+        if (data.type == "ssh+sql" && data.ssh_password) {
             data.ssh_password = app.decrypt(data.ssh_password, data.hash+data.key);
         }
     }
-    database.load(data, function(client) {
-        app.__mysql = client;
-        app.instance.__selected = instance;
-        app.database.databases();
-    });
+    // clear all
     app.database.__selected = undefined;
     $('#menu .databases li.active').removeClass('active');
     $("#list .content").html("");
@@ -143,6 +179,12 @@ app.instance.set = function(instance) {
     $("#workspace .top .buttons.terminal").hide();
     $("#workspace .top .buttons.table").hide();
     $("#workspace .top .buttons.database").hide();
+
+    database.load(data, function(client) {
+        app.__mysql = client;
+        app.instance.__selected = instance;
+        app.database.databases(data.database);
+    });
 };
 
 app.database = {
@@ -156,6 +198,7 @@ app.database = {
 app.database.set = function(database) {
     app.database.tables(database);
     $("#list .top label").html("<i class='fas fa-database'></i>" + database);
+    $("#workspace .content .table").remove();
     $("#workspace .content > div").hide();
     $("#workspace .top .buttons.terminal").hide();
     $("#workspace .top .buttons.table").hide();
@@ -173,7 +216,7 @@ app.database.query = function(query, callback) {
     }
 };
 
-app.database.databases = function() {
+app.database.databases = function(database) {
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.databases-but').addClass('active').show();
 
@@ -202,6 +245,9 @@ app.database.databases = function() {
             notulous.util.renderTpl("databases", databases)
         );
         app.actions.databases();
+        if (database) {
+            $("#db-" + database).trigger("click");
+        }
     });
 };
 
@@ -241,6 +287,7 @@ app.database.table = function(table, page, sort, order, filter) {
     data.page = page ? page : 1;
     data.start = data.page - 1;
     data.start = data.start * data.limit;
+    data.hash = crypt.createHash('md5').update(JSON.stringify(data)).digest('hex');
     if (sort && order) {
         data.query += " ORDER BY " + sort + " " + order;
     }
@@ -288,42 +335,42 @@ app.database.__getTable = function(data) {
             data.start += 1;
             app.database.__tableData = data;
             var filterHTML;
-            var filters = $("#workspace .content .filters").length;
-            var html = $("#workspace .content .filters").length > 0 ? $("#workspace .content .filters").html().trim() : undefined;
+            var filters = $("#workspace .content .table." + data.hash + " .filters").length;
+            var html = $("#workspace .content .table." + data.hash + " .filters").length > 0 ? $("#workspace .content .table." + data.hash + " .filters").html().trim() : undefined;
             if (data.filter && filters > 0 && html != "") {
-                filterHTML = $("#workspace .content .filters").clone();
-                filterHTML.find("[name=field]").val($("#workspace .content .filters [name=field]").val());
-                filterHTML.find("[name=filter]").val($("#workspace .content .filters [name=filter]").val());
+                filterHTML = $("#workspace .content .table." + data.hash + " .filters").clone();
+                filterHTML.find("[name=field]").val($("#workspace .content .table." + data.hash + " .filters [name=field]").val());
+                filterHTML.find("[name=filter]").val($("#workspace .content .table." + data.hash + " .filters [name=filter]").val());
             }
 
             html = notulous.util.renderTpl("table", data);
             $("#workspace .content > div").hide();
-            if ($("#workspace .content > .table").length > 0) {
-                $("#workspace .content > .table").replaceWith(html);
-                $("#workspace .content > .table").show();
+            if ($("#workspace .content .table." + data.table).length > 0) {
+                $("#workspace .content .table." + data.table).replaceWith(html);
+                $("#workspace .content .table." + data.table).show();
             } else {
                 $("#workspace .content").append(html);
             }
             if (filterHTML) {
-                $("#workspace .content .filters").replaceWith(filterHTML);
+                $("#workspace .content .table." + data.hash + " .filters").replaceWith(filterHTML);
                 app.actions.tableFilter();
             }
-            $("#workspace .content > .table th").on("click", function() {
+            $("#workspace .content .table." + data.hash + " th").on("click", function() {
                 var order = $(this).data("order");
                 if (notulous.util.empty(order)) {
                     order = 'desc';
                 }
                 app.database.table(
-                    $("#workspace .content > .table table").data("table"),
+                    $("#workspace .content .table." + data.hash + " table").data("table"),
                     undefined,
                     $(this).data("sort"),
                     order,
                     app.database.__tableData.filter
                 );
             });
-            $("#workspace .content > .table tbody tr").on("click", function() {
+            $("#workspace .content .table." + data.hash + " tbody tr").on("click", function() {
                 var index = $(this).data('index');
-                var table = $("#workspace .content > .table table").data("table");
+                var table = $("#workspace .content .table." + data.hash + " table").data("table");
                 var data = {
                     maxheight: $(window).height()-250,
                     table: table,
@@ -360,8 +407,8 @@ app.database.__getTable = function(data) {
                     });
                 });
             });
-            $("#workspace .content > .table .status .next, #workspace .content > .table .status .previous").on("click", function() {
-                var table = $("#workspace .content > .table table");
+            $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
+                var table = $("#workspace .content .table." + data.hash + " table");
                 app.database.table(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
             });
         });
@@ -580,11 +627,17 @@ app.actions.databases = function() {
 app.actions.tables = function() {
     $("#list .content .search input").focus();
     $('#list .tables li').on('click', function(e) {
-        app.database.table($(this).text());
+        var table = $(this).text();
         $('#list .tables li.active').removeClass('active');
         $("#workspace .top .buttons").not(".database").hide();
         $("#workspace .top .buttons.table").show();
         $(this).addClass('active');
+        if ($("#workspace .content .table." + table).length > 0) {
+            $("#workspace .content > div").hide();
+            $("#workspace .content .table." +table).show();
+            return;
+        }
+        app.database.table($(this).text());
     });
 };
 
@@ -635,6 +688,8 @@ app.actions.tableFilter = function() {
 
 app.actions.instances = function() {
     $('#menu .instances li').on('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
         app.instance.set($(this).data('key'));
     });
 };
@@ -678,18 +733,30 @@ app.actions.workspace = function() {
 
 app.actions.topMenus = function() {
     $(".top").on("dblclick", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         window.maximize();
     });
 
     $('#menu .top .button.instances-but').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         app.instance.get();
     });
 
     $('#menu .top .button.databases-but').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         app.database.databases();
     });
 
     $('#workspace .top .database .terminal').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         $("#workspace .content > div").hide();
         $("#workspace .top .buttons.terminal").show();
         $("#workspace .top .buttons.table").hide();
@@ -720,13 +787,19 @@ app.actions.topMenus = function() {
     });
 
     $('#workspace .top .database .table').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         $("#workspace .content > div").hide();
-        $("#workspace .content > .table").show();
+        $("#workspace .content .table." + app.database.__tableData.table).show();
         $("#workspace .top .buttons.table").show();
         $("#workspace .top .buttons.terminal").hide();
     });
 
     $('#workspace .top .buttons.table .filter').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         if ($("#workspace .content .filters").html().trim() != "") {
             $("#workspace .content .filters").html("");
             $("#workspace .content .container").css({top: 0});
@@ -742,6 +815,9 @@ app.actions.topMenus = function() {
     });
 
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         app.database.getAndRunCustomQuery();
     });
 
@@ -1056,9 +1132,7 @@ app.urlify = function(text) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
 };
 
-
 app.encrypt = function(text, secret){
-    console.log(crypt);
     var cipher = crypt.createCipher(algorithm, password+secret);
     var crypted = cipher.update(text,'utf8','hex');
     crypted += cipher.final('hex');

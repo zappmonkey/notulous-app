@@ -21,10 +21,8 @@ notulous.config.save = function(config) {
             console.log(err);
             throw "Unable to save configuration";
         }
-        console.log("The file was saved!");
         notulous.config.__config = config;
     });
-    return notulous.config.__config;
 };
 
 notulous.config.instance = function(key) {

@@ -7,8 +7,9 @@ database.load = function(instance, callback) {
         throw "database load instance not defined";
     }
     if (database.__instances.hasOwnProperty(instance.key)) {
-        if (callback) {
-            callback(database.__instances[instance.key].mysql);
+        var mysql = database.__instances[instance.key].mysql;
+        if (mysql.ping() == 'OK' && callback) {
+            return callback(database.__instances[instance.key].mysql);
         }
     }
     if (instance.type == 'sql') {

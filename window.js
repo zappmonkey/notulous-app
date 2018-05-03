@@ -58,6 +58,16 @@ const template = [{
     click: () => {
         app.instance.edit(item.data("key"));
     }
+},{
+    label: 'Duplicate',
+    click: () => {
+        app.instance.duplicate(item.data("key"));
+    }
+},{
+    label: 'Remove',
+    click: () => {
+        app.instance.remove(item.data("key"));
+    }
 }];
 const menu = Menu.buildFromTemplate(template);
 
