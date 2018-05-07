@@ -53,7 +53,7 @@ function createMenu() {
     // }))
     const template = [
     {
-        label: 'Edit',
+        label: 'Instance',
         submenu: [
             {
                 label: 'Add instance',
@@ -72,6 +72,30 @@ function createMenu() {
             {role: 'pasteandmatchstyle'},
             {role: 'delete'},
             {role: 'selectall'}
+        ]
+    },
+    {
+        label: 'Database',
+        submenu: [
+            {
+                label: 'Run queries...',
+                accelerator: 'CmdOrCtrl+Alt+R',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('run-queries');
+                }
+            }
+        ]
+    },
+    {
+        label: 'Table',
+        submenu: [
+            {
+                label: 'Filter',
+                accelerator: 'CmdOrCtrl+F',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-filter');
+                }
+            }
         ]
     },
     {
@@ -118,30 +142,6 @@ function createMenu() {
                 accelerator: 'CmdOrCtrl+P',
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('search-all');
-                }
-            }
-        ]
-    },
-    {
-        label: 'Database',
-        submenu: [
-            {
-                label: 'Run queries...',
-                accelerator: 'CmdOrCtrl+Alt+R',
-                click (menuItem, currentWindow) {
-                    currentWindow.webContents.send('run-queries');
-                }
-            }
-        ]
-    },
-    {
-        label: 'Table',
-        submenu: [
-            {
-                label: 'Filter',
-                accelerator: 'CmdOrCtrl+F',
-                click (menuItem, currentWindow) {
-                    currentWindow.webContents.send('table-filter');
                 }
             }
         ]

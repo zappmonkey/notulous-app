@@ -37,6 +37,7 @@
                     <div class="button run"><i class="fas fa-play fa-sm"></i></div>
                 </div>
                 <div class="buttons table">
+                    <label></label>
                     <div class="button filter"><i class="fas fa-filter"></i></div>
                     <div class="button wrench"><i class="fas fa-wrench"></i></div>
                     <div class="button info"><i class="fas fa-info"></i></div>
@@ -91,7 +92,7 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-filter="{{filter}}" data-hash="{{hash}}">
+        <table class="table clickable" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-filter="{{filter}}" data-hash="{{hash}}">
             <thead>
                 <tr>
                     {{#each fields}}

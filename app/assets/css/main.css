@@ -114,18 +114,24 @@ body #list {
     user-select: none;
 }
 
-body #list label {
+body #list label, body #workspace label {
     display: inline-block;
     line-height: 38px;
     text-align: center;
     color: #999;
     text-shadow: 0 1px 1px #fff;
+    margin-right: 20px;
 }
 
-body #list label svg {
+body #list label svg, body #workspace label svg {
     margin-right: 5px;
     font-size: 0.8em;
     opacity: 0.5;
+    position: relative;
+}
+
+body #workspace label svg {
+    /* top: -1px; */
 }
 
 body #list .content {

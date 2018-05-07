@@ -114,10 +114,12 @@ app.instance.add = function(instanceData) {
                 data.name = data.host;
             }
             if (notulous.util.empty(data.key)) {
-                data.key = app.urlify(data.name);
+                data.key = app.hash();
                 if (config.instances[data.key]) {
-                    data.key = app.hash() + "_" + data.key;
+                    data.key = app.hash();
                 }
+            }
+            if (notulous.util.empty(data.hash)) {
                 data.hash = app.hash();
             }
             if (data.hasOwnProperty("password") && !notulous.util.empty(data.password)) {
@@ -335,12 +337,12 @@ app.database.__getTable = function(data) {
             data.start += 1;
             app.database.__tableData = data;
             var filterHTML;
-            var filters = $("#workspace .content .table." + data.hash + " .filters").length;
-            var html = $("#workspace .content .table." + data.hash + " .filters").length > 0 ? $("#workspace .content .table." + data.hash + " .filters").html().trim() : undefined;
+            var filters = $("#workspace .content .table:visible .filters").length;
+            var html = $("#workspace .content .table:visible .filters").length > 0 ? $("#workspace .content .table:visible .filters").html().trim() : undefined;
             if (data.filter && filters > 0 && html != "") {
-                filterHTML = $("#workspace .content .table." + data.hash + " .filters").clone();
-                filterHTML.find("[name=field]").val($("#workspace .content .table." + data.hash + " .filters [name=field]").val());
-                filterHTML.find("[name=filter]").val($("#workspace .content .table." + data.hash + " .filters [name=filter]").val());
+                filterHTML = $("#workspace .content .table:visible .filters").clone();
+                filterHTML.find("[name=field]").val($("#workspace .content .table:visible .filters [name=field]").val());
+                filterHTML.find("[name=filter]").val($("#workspace .content .table:visible .filters [name=filter]").val());
             }
 
             html = notulous.util.renderTpl("table", data);
@@ -360,17 +362,20 @@ app.database.__getTable = function(data) {
                 if (notulous.util.empty(order)) {
                     order = 'desc';
                 }
+                var data = $(this).closest("table").data();
+
                 app.database.table(
-                    $("#workspace .content .table." + data.hash + " table").data("table"),
+                    data.table,
                     undefined,
                     $(this).data("sort"),
                     order,
-                    app.database.__tableData.filter
+                    data.filter
                 );
             });
             $("#workspace .content .table." + data.hash + " tbody tr").on("click", function() {
                 var index = $(this).data('index');
-                var table = $("#workspace .content .table." + data.hash + " table").data("table");
+                var el = $(this).closest("table");
+                var table = $(this).closest("table").data("table");
                 var data = {
                     maxheight: $(window).height()-250,
                     table: table,
@@ -408,7 +413,7 @@ app.database.__getTable = function(data) {
                 });
             });
             $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
-                var table = $("#workspace .content .table." + data.hash + " table");
+                var table = $(this).closest("table");
                 app.database.table(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
             });
         });
@@ -630,10 +635,11 @@ app.actions.tables = function() {
         var table = $(this).text();
         $('#list .tables li.active').removeClass('active');
         $("#workspace .top .buttons").not(".database").hide();
+        $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
         $("#workspace .top .buttons.table").show();
         $(this).addClass('active');
+        $("#workspace .content > div").hide();
         if ($("#workspace .content .table." + table).length > 0) {
-            $("#workspace .content > div").hide();
             $("#workspace .content .table." +table).show();
             return;
         }
@@ -642,9 +648,9 @@ app.actions.tables = function() {
 };
 
 app.actions.tableFilter = function() {
-    $("#workspace .content .container").css({top: $("#workspace .content .filters").outerHeight()});
-    $("#workspace .content .filters").show();
-    $("#workspace .content .filters [name='filter']").on('change', function(e) {
+    $("#workspace .content .table:visible .container").css({top: $("#workspace .content .table:visible .filters").outerHeight()});
+    $("#workspace .content .table:visible .filters").show();
+    $("#workspace .content .table:visible .filters [name='filter']").on('change', function(e) {
         var selected = $(this).find(":selected");
         if (selected.data('hidevalue')) {
             $("#workspace .content .filters [name='value1']").hide();
@@ -657,30 +663,32 @@ app.actions.tableFilter = function() {
             $("#workspace .content .filters [name='value2']").show();
         }
     });
-    $("#workspace .content .filters a.clear").on('click', function(e) {
+    $("#workspace .content .table:visible .filters a.clear").on('click', function(e) {
+        var data = $(this).closest(".table").find("table").data();
         app.database.__tableData.filter = undefined;
         app.database.table(
-            app.database.__tableData.table,
-            app.database.__tableData.page,
-            app.database.__tableData.sort,
-            app.database.__tableData.order
+            data.table,
+            data.page,
+            data.sort,
+            data.order
         );
     });
-    $("#workspace .content .filters").on('submit', function(e) {
+    $("#workspace .content .table:visible .filters").on('submit', function(e) {
         e.stopPropagation();
         e.preventDefault();
-        $("#workspace .content .filters a.clear").show();
+        $("#workspace .content .table:visible .filters a.clear").show();
         var filter = app.convertToQuery(
-            $("#workspace .content .filters [name='field']").val(),
-            $("#workspace .content .filters [name='filter']").val(),
-            $("#workspace .content .filters [name='value1']").val(),
-            $("#workspace .content .filters [name='value2']").val()
+            $("#workspace .content .table:visible .filters [name='field']").val(),
+            $("#workspace .content .table:visible .filters [name='filter']").val(),
+            $("#workspace .content .table:visible .filters [name='value1']").val(),
+            $("#workspace .content .table:visible .filters [name='value2']").val()
         );
+        var data = $("#workspace .content .table:visible table").data();
         app.database.table(
-            $("#workspace .content table").data("table"),
+            data.table,
             undefined,
-            app.database.__tableData.sort,
-            app.database.__tableData.order,
+            data.sort,
+            data.order,
             filter,
         );
     });
@@ -800,15 +808,15 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
 
-        if ($("#workspace .content .filters").html().trim() != "") {
-            $("#workspace .content .filters").html("");
-            $("#workspace .content .container").css({top: 0});
-            $("#workspace .content .filters").hide();
+        if ($("#workspace .content .table:visible .filters").html().trim() != "") {
+            $("#workspace .content .table:visible .filters").html("");
+            $("#workspace .content .table:visible .container").css({top: 0});
+            $("#workspace .content .table:visible .filters").hide();
             return;
         }
-        $("#workspace .content .filters").html(
+        $("#workspace .content .table:visible .filters").html(
             notulous.util.renderTpl("filter", {
-                columns: app.database.tableColumns($("#workspace .content table").data("table"))
+                columns: app.database.tableColumns($("#workspace .content .table:visible table").data("table"))
             })
         );
         app.actions.tableFilter();
