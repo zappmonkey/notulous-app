@@ -61,27 +61,24 @@ function createMenu() {
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('add-instance');
                 }
-            },
-            {type: 'separator'},
-            {role: 'undo'},
-            {role: 'redo'},
-            {type: 'separator'},
-            {role: 'cut'},
-            {role: 'copy'},
-            {role: 'paste'},
-            {role: 'pasteandmatchstyle'},
-            {role: 'delete'},
-            {role: 'selectall'}
+            }
         ]
     },
     {
         label: 'Database',
         submenu: [
             {
-                label: 'Run queries...',
+                label: 'Add',
+                accelerator: 'CmdOrCtrl+Alt+A',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('add-database');
+                }
+            },
+            {
+                label: 'Remove',
                 accelerator: 'CmdOrCtrl+Alt+R',
                 click (menuItem, currentWindow) {
-                    currentWindow.webContents.send('run-queries');
+                    currentWindow.webContents.send('remove-database');
                 }
             }
         ]

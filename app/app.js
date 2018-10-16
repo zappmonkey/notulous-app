@@ -206,7 +206,8 @@ app.database.set = function(database) {
     $("#workspace .top .buttons.table").hide();
     $("#workspace .top .buttons.database").show();
     $('#menu .databases li.active').removeClass('active');
-    $(this).addClass('active');
+    $('#menu .databases li[data-database="' + database + '"').addClass('active');
+
 };
 
 app.database.query = function(query, callback) {
@@ -273,6 +274,17 @@ app.database.tables = function(database) {
 
 app.database.table = function(table, page, sort, order, filter) {
 
+    $('#list .tables li.active').removeClass('active');
+    $("#workspace .top .buttons").not(".database").hide();
+    $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
+    $("#workspace .top .buttons.table").show();
+    $('#list .tables li[data-table="' + table + '"]').addClass('active');
+    if ($("#workspace .content .table." + table).length > 0 && $("#workspace .content .table." + table).data("sort") == sort && $("#workspace .content .table." + table).data("order") == order && $("#workspace .content .table." + table).data("page") == page) {
+        $("#workspace .content > div").hide();
+        $("#workspace .content .table." +table).show();
+        return;
+    }
+
     app.database.tableColumns(table);
 
     var data = {
@@ -281,7 +293,7 @@ app.database.table = function(table, page, sort, order, filter) {
         sort: sort,
         order: order,
         limit: 1000,
-        query: 'SELECT * FROM ' + table
+        query: "SELECT * FROM" + " `" + table + "`"
     };
     if (data.filter) {
         data.query += " WHERE " + data.filter;
@@ -291,7 +303,7 @@ app.database.table = function(table, page, sort, order, filter) {
     data.start = data.start * data.limit;
     data.hash = crypt.createHash('md5').update(JSON.stringify(data)).digest('hex');
     if (sort && order) {
-        data.query += " ORDER BY " + sort + " " + order;
+        data.query += " ORDER BY `" + sort + "` " + order;
     }
     data.query += " LIMIT " + data.start + ", " + data.limit + ";";
     app.database.__getTable(data);
@@ -363,7 +375,7 @@ app.database.__getTable = function(data) {
                     order = 'desc';
                 }
                 var data = $(this).closest("table").data();
-
+                console.log(data, order, $(this).data("sort"));
                 app.database.table(
                     data.table,
                     undefined,
@@ -478,7 +490,7 @@ app.database.runCustomQuery = function(query, sort, order) {
         if (baseQuery) {
             query = baseQuery;
         }
-        query += " ORDER BY " + sort + " " + order;
+        query += " ORDER BY `" + sort + "` " + order;
         if (postQueryString) {
             query += " " + postQueryString;
         }
@@ -623,27 +635,18 @@ app.actions.init = function() {
 app.actions.databases = function() {
     $("#menu .content .search input").focus();
     $('#menu .databases li').on('click', function(e) {
-        app.database.set($(this).text());
-        $('#menu .databases li.active').removeClass('active');
-        $(this).addClass('active');
+        app.database.set(
+            $(this).data('database')
+        );
     });
 };
 
 app.actions.tables = function() {
     $("#list .content .search input").focus();
     $('#list .tables li').on('click', function(e) {
-        var table = $(this).text();
-        $('#list .tables li.active').removeClass('active');
-        $("#workspace .top .buttons").not(".database").hide();
-        $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
-        $("#workspace .top .buttons.table").show();
-        $(this).addClass('active');
-        $("#workspace .content > div").hide();
-        if ($("#workspace .content .table." + table).length > 0) {
-            $("#workspace .content .table." +table).show();
-            return;
-        }
-        app.database.table($(this).text());
+        app.database.table(
+            $(this).data('table')
+        );
     });
 };
 

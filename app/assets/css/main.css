@@ -6,6 +6,7 @@
 body {
     font-family: 'BlinkMacSystemFont', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
     font-size: 11px;
+    background: #252525;
     /* -webkit-font-smoothing: antialiased; */
 }
 

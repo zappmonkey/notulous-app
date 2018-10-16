@@ -44,7 +44,8 @@ notulous.util.empty = function(val) {
             return true;
     }
     return false;
-}
+};
+
 notulous.util.fuzzyCompare = function(search, compare, startWith) {
     if (compare == undefined || search == undefined) {
         return false;

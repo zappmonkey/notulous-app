@@ -71,9 +71,9 @@
         <input type="text" placeholder="filter"/>
     </div>
     <ul class="databases">
-    {{#each system}}<li><i><i class="fas fa-database" id="db-{{this}}"></i></i>{{this}}</li>{{/each}}
+    {{#each system}}<li data-database="{{this}}"><i><i class="fas fa-database" id="db-{{this}}"></i></i>{{this}}</li>{{/each}}
     {{#if system}}<li class="seperator"></li>{{/if}}
-    {{#each user}}<li><i><i class="fas fa-database"id="db-{{this}}"></i></i>{{this}}</li>{{/each}}
+    {{#each user}}<li data-database="{{this}}"><i><i class="fas fa-database"id="db-{{this}}"></i></i>{{this}}</li>{{/each}}
     </ul>
 </script>
 
@@ -83,7 +83,7 @@
         <input type="text" placeholder="filter"/>
     </div>
     <ul class="tables">
-    {{#each tables}}<li><i><i class="fas fa-table"></i></i>{{property this 'tables_in_' true true}}</li>{{/each}}
+    {{#each tables}}<li data-table="{{property this 'tables_in_' true true}}"><i><i class="fas fa-table"></i></i>{{property this 'tables_in_' true true}}</li>{{/each}}
     </ul>
 </script>
 
@@ -92,7 +92,7 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-filter="{{filter}}" data-hash="{{hash}}">
+        <table class="table clickable" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
             <thead>
                 <tr>
                     {{#each fields}}
@@ -297,6 +297,7 @@
         <div class="content">
             <div class="mysql">
                 <input type="hidden" name="key" value="{{instance.key}}"/>
+                <input type="hidden" name="hash" value="{{instance.hash}}"/>
                 <div class="row">
                     <label class="w3">
                         <input type="radio" name="type" value="sql"{{#if instance}}{{#ifEq instance.type "sql"}} checked="checked"{{/ifEq}}{{else}} checked="checked"{{/if}}/> MySQL
