@@ -3,6 +3,7 @@ var crypt = require('crypto'),
     password = 'd6F3Efeq';
 
 var app = {
+    name: "Notulous",
     __con: undefined,
     __mysql: undefined,
     __editor: undefined,
@@ -166,7 +167,7 @@ app.instance.get = function() {
 
 app.instance.set = function(instance) {
     var data = notulous.config.instance(instance);
-    if (data.hash) {
+    if (data.hash && data.password) {
         data.password = app.decrypt(data.password, data.hash+data.key);
         if (data.type == "ssh+sql" && data.ssh_password) {
             data.ssh_password = app.decrypt(data.ssh_password, data.hash+data.key);
@@ -186,7 +187,7 @@ app.instance.set = function(instance) {
         app.__mysql = client;
         app.instance.__selected = instance;
         app.database.databases(data.database);
-    });
+    }, true);
 };
 
 app.database = {
@@ -375,7 +376,6 @@ app.database.__getTable = function(data) {
                     order = 'desc';
                 }
                 var data = $(this).closest("table").data();
-                console.log(data, order, $(this).data("sort"));
                 app.database.table(
                     data.table,
                     undefined,
@@ -425,7 +425,7 @@ app.database.__getTable = function(data) {
                 });
             });
             $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
-                var table = $(this).closest("table");
+                var table = $(this).closest(".table").find("table");
                 app.database.table(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
             });
         });
@@ -702,6 +702,8 @@ app.actions.instances = function() {
         e.stopPropagation();
         e.preventDefault();
         app.instance.set($(this).data('key'));
+        $("html title").text(app.name + " - " +  $(this).data('name'));
+        $(this).addClass('active');
     });
 };
 
@@ -1143,14 +1145,14 @@ app.urlify = function(text) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
 };
 
-app.encrypt = function(text, secret){
+app.encrypt = function(text, secret) {
     var cipher = crypt.createCipher(algorithm, password+secret);
     var crypted = cipher.update(text,'utf8','hex');
     crypted += cipher.final('hex');
     return crypted;
 };
 
-app.decrypt = function(text, secret){
+app.decrypt = function(text, secret) {
     var decipher = crypt.createDecipher(algorithm, password+secret);
     var dec = decipher.update(text,'hex','utf8');
     dec += decipher.final('utf8');

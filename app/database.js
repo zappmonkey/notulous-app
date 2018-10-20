@@ -2,15 +2,18 @@ var database = {
     __instances: {}
 };
 
-database.load = function(instance, callback) {
+database.load = function(instance, callback, close_others) {
     if (!instance) {
         throw "database load instance not defined";
     }
-    if (database.__instances.hasOwnProperty(instance.key)) {
+    if (database._has_active_instance(instance)) {
         var mysql = database.__instances[instance.key].mysql;
         if (mysql.ping() == 'OK' && callback) {
             return callback(database.__instances[instance.key].mysql);
         }
+    }
+    if (close_others) {
+        database.closeAll();
     }
     if (instance.type == 'sql') {
         var mysql = require('mysql2');
@@ -34,18 +37,28 @@ database.load = function(instance, callback) {
     }
 };
 
+database.close = function(instance) {
+    if (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance])) {
+        if (!notulous.util.empty(database.__instances[instance].mysql) && 'end' in database.__instances[instance].mysql) {
+            database.__instances[instance].mysql.end(function(err) {});
+        }
+        if (!notulous.util.empty(database.__instances[instance].ssh) && 'end' in database.__instances[instance].ssh) {
+            database.__instances[instance].ssh.end();
+        }
+        database.__instances[instance] = undefined;
+    }
+};
+
 database.closeAll = function() {
-    for (var key in database.__instances) {
-        if (database.__instances.hasOwnProperty(key) && !notulous.util.empty(database.__instances[key])) {
-            if (!notulous.util.empty(database.__instances[key].mysql) && 'end' in database.__instances[key].mysql) {
-                database.__instances[key].mysql.end(function(err) {});
-            }
-            if (!notulous.util.empty(database.__instances[key].ssh) && 'end' in database.__instances[key].ssh) {
-                database.__instances[key].ssh.end();
-            }
-            database.__instances[key] = undefined;
+    for (var instance in database.__instances) {
+        if (database._has_active_instance(instance)) {
+            database.close(instance);
         }
     }
+};
+
+database._has_active_instance = function(instance) {
+    return (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance]));
 };
 
 database._ssh_config = function(instance) {

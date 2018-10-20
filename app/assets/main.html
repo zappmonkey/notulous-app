@@ -61,7 +61,7 @@
         <input type="text" placeholder="filter"/>
     </div>
     <ul class="instances">
-    {{#each instances}}{{#if name}}<li data-key="{{key}}"><i><i class="fas fa-server"></i></i>{{name}}</li>{{/if}}{{/each}}
+    {{#each instances}}{{#if name}}<li data-key="{{key}}" data-name="{{name}}"><i><i class="fas fa-server"></i></i>{{name}}</li>{{/if}}{{/each}}
     </ul>
 </script>
 
