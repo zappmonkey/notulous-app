@@ -384,7 +384,7 @@ app.database.__getTable = function(data) {
                     data.filter
                 );
             });
-            $("#workspace .content .table." + data.hash + " tbody tr").on("click", function() {
+            $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
                 var index = $(this).data('index');
                 var el = $(this).closest("table");
                 var table = $(this).closest("table").data("table");
@@ -831,6 +831,13 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
         app.database.refreshTable();
+    });
+
+
+    $('#workspace .top .buttons.table .transpose').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#workspace .content .table:visible").toggleClass("transpose");
     });
 
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {

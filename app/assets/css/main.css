@@ -306,7 +306,7 @@ table tr td, table tr th {
     background: rgba(255,255,255,0.7);
 }
 
-table thead tr th {
+table tr th {
     position: sticky;
     top: 0;
     z-index: 2;
@@ -371,6 +371,38 @@ table tr td.actions i {
 
 table tr td.actions i:hover {
     opacity: 1;
+}
+
+table.transpose tbody {
+    /*display: table;*/
+}
+
+table.transpose tr {
+    display: table-cell;
+}
+
+table.transpose tr.header {
+    position: fixed;
+}
+
+table.transpose tr.first {
+    padding-left: 160px;
+}
+
+table.transpose tr td, table.transpose tr th {
+    display: block;
+    height: 31px;
+    min-width: 100px;
+}
+
+table.transpose tr th {
+    left: 0;
+    width: 160px;
+    min-width: 160px;
+}
+
+table.transpose tr th:after {
+    border-bottom: 1px solid #ededed;
 }
 
 #workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, body #workspace .content .editor-container, #workspace .content .results {
