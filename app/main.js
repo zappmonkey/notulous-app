@@ -128,13 +128,20 @@ function createMenu() {
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('table-filter');
                 }
+            },
+            {
+                label: 'Reload',
+                accelerator: 'CmdOrCtrl+R',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-reload');
+                }
             }
         ]
     },
     {
       label: 'View',
         submenu: [
-            {role: 'reload'},
+            // {role: 'reload'},
             {role: 'forcereload'},
             {role: 'toggledevtools'},
             // {type: 'separator'},

@@ -39,6 +39,10 @@ ipcRenderer.on('table-filter', function() {
     }
 });
 
+ipcRenderer.on('table-reload', function() {
+    app.database.refreshTable();
+});
+
 ipcRenderer.on('run-queries', function() {
     if ($("#workspace .buttons.terminal").is(":visible")) {
         $("#workspace .buttons.terminal .run").trigger("click");

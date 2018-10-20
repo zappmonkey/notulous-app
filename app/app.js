@@ -827,6 +827,12 @@ app.actions.topMenus = function() {
         app.actions.tableFilter();
     });
 
+    $('#workspace .top .buttons.table .refresh').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        app.database.refreshTable();
+    });
+
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
