@@ -94,7 +94,7 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
+        <table class="table clickable{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
             <!--<thead>-->
                 <tr class="header">
                     {{#each fields}}
@@ -107,8 +107,9 @@
                 </tr>
             <!--</thead>-->
             <!--<tbody>-->
+                <tr class="first"></tr>
                 {{#each records}}
-                <tr data-index="{{@index}}" class="{{#ifEq @index '0'}}first{{/ifEq}}">{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+                <tr data-index="{{@index}}">{{#each this}}<td>{{this}}</td>{{/each}}</tr>
                 {{/each}}
             <!--</tbody>-->
         </table>

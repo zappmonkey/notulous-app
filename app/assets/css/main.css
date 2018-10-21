@@ -186,6 +186,10 @@ body #workspace .button {
     color: #000;
 }
 
+body #workspace .button.active {
+    color: #039203;
+}
+
 body #workspace .status .button {
     padding: 7px;
 }
@@ -318,7 +322,7 @@ table tr th {
     border-bottom: none;
 }
 
-table.clickable tbody tr:hover {
+table.clickable tbody tr:not(.header):hover {
     background: rgba(0, 0, 0, 0.12);
 }
 
@@ -385,8 +389,14 @@ table.transpose tr.header {
     position: fixed;
 }
 
+table tr.first {
+    display: none;
+    width: 160px;
+    min-width: 160px;
+}
+
 table.transpose tr.first {
-    padding-left: 160px;
+    display: table-cell;
 }
 
 table.transpose tr td, table.transpose tr th {
@@ -399,6 +409,7 @@ table.transpose tr th {
     left: 0;
     width: 160px;
     min-width: 160px;
+    border-right: 1px solid #ededed;
 }
 
 table.transpose tr th:after {

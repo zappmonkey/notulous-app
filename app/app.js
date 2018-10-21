@@ -314,6 +314,10 @@ app.database.refreshTable = function() {
     app.database.__getTable(app.database.__tableData);
 };
 
+app.database.tableTransposed = function() {
+    return $("#workspace .top .buttons.table .transpose").hasClass("active");
+};
+
 app.database.tableColumns = function(table, force) {
     if (!force && app.database.__columns[table]) {
         return app.database.__columns[table];
@@ -357,7 +361,7 @@ app.database.__getTable = function(data) {
                 filterHTML.find("[name=field]").val($("#workspace .content .table:visible .filters [name=field]").val());
                 filterHTML.find("[name=filter]").val($("#workspace .content .table:visible .filters [name=filter]").val());
             }
-
+            data.transposed = app.database.tableTransposed();
             html = notulous.util.renderTpl("table", data);
             $("#workspace .content > div").hide();
             if ($("#workspace .content .table." + data.table).length > 0) {
@@ -838,6 +842,9 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
         $("#workspace .content .table:visible").toggleClass("transpose");
+        if ($("#workspace .content .table:visible").hasClass("transpose")) {
+            $('#workspace .top .buttons.table .transpose').addClass('active');
+        }
     });
 
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {
