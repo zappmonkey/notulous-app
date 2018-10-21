@@ -854,6 +854,8 @@ app.actions.topMenus = function() {
         $("#workspace .content .table:visible").toggleClass("transpose");
         if ($("#workspace .content .table:visible").hasClass("transpose")) {
             $('#workspace .top .buttons.table .transpose').addClass('active');
+        } else {
+            $('#workspace .top .buttons.table .transpose').removeClass('active');
         }
     });
 
