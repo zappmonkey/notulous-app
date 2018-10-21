@@ -71,6 +71,30 @@ input[type=radio] {
     border-bottom: none;
 }
 
+#menu .instance {
+    padding: 5px 20px;
+    font-weight: bold;
+    text-shadow: 0 1px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+}
+
+#menu .instance.red {
+    color: #f00;
+}
+#menu .instance.orange {
+    color: #f90;
+}
+#menu .instance.blue {
+    color: #09f;
+}
+#menu .instance.green {
+    color: #0a0;
+}
+#menu .instance.purple {
+    color: #ba00ff;
+}
+
 body #menu, body #list, body #workspace {
     position: absolute;
     top: 0;
@@ -650,6 +674,10 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
     padding: 5px 0;
 }
 
+#overlay #modal .content label.color {
+    margin: 12px 8px;
+}
+
 #overlay #modal .content label span {
     font-weight: bold;
     margin: 0 0 7px;
@@ -667,6 +695,43 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
 #overlay #modal .content input, #overlay #modal .content textarea {
     width: 100%;
     max-width: 100%;
+}
+
+#overlay #modal .content input[name='color'] {
+    background: rgba(255,255,255,0.5);
+    -webkit-appearance: none;
+    border-radius: 8px;
+    border-color: #666;
+    width: 16px!important;
+    height: 16px!important;
+    padding: 0;
+    opacity: 0.5;
+    vertical-align: middle;
+    margin: 0 6px;
+}
+
+#overlay #modal .content input[name='color'] {
+    background: rgba(255,255,255,0.5);
+}
+
+#overlay #modal .content input[name='color']:hover, #overlay #modal .content input[name='color']:checked {
+    opacity: 1;
+}
+
+#overlay #modal .content input[name='color'].red {
+    background: #f00;
+}
+#overlay #modal .content input[name='color'].orange {
+    background: #f90;
+}
+#overlay #modal .content input[name='color'].blue {
+    background: #09f;
+}
+#overlay #modal .content input[name='color'].green {
+    background: #0a0;
+}
+#overlay #modal .content input[name='color'].purple {
+    background: #ba00ff;
 }
 
 #overlay #modal .content textarea {

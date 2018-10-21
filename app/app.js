@@ -31,11 +31,15 @@ app.config = function() {
 
 app.instance = {
     __selected: undefined,
+    __selected_data: undefined,
     __instances: undefined
 };
 
 app.instance.getSelected = function() {
     return app.instance.__selected;
+};
+app.instance.getSelectedData = function() {
+    return app.instance.__selected_data;
 };
 
 app.instance.remove = function(instance) {
@@ -78,7 +82,7 @@ app.instance.add = function(instanceData) {
     $("#overlay .overlay-bg, #modal .close").on("click", function() {
         $("#overlay").remove();
     });
-    $("#modal input[type=radio]").on("change", function() {
+    $("#modal input[name='type']").on("change", function() {
         if ($(this).val() == "sql") {
             $("#modal .content .ssh").hide();
         } else {
@@ -186,6 +190,12 @@ app.instance.set = function(instance) {
     database.load(data, function(client) {
         app.__mysql = client;
         app.instance.__selected = instance;
+        app.instance.__selected_data = {
+            name: data.name,
+            host: data.host,
+            key: data.key,
+            color: data.color
+        };
         app.database.databases(data.database);
     }, true);
 };
@@ -228,7 +238,7 @@ app.database.databases = function(database) {
         if (err) {
             return app.error(err);
         }
-        var databases = {system: [], user: []};
+        var databases = {instance: app.instance.getSelectedData(), system: [], user: []};
         for (var i=0; i<results.length; i++) {
             for (var prop in results[i]) {
                 if (prop.toLowerCase() == 'database') {

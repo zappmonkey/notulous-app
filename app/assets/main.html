@@ -68,6 +68,9 @@
 </script>
 
 <script type="text/template" id="tpl-databases">
+    <div class="instance {{instance.color}}">
+        {{instance.name}}
+    </div>
     <div class="search">
         <span><i class="fas fa-search"></i></span>
         <input type="text" placeholder="filter"/>
@@ -95,23 +98,19 @@
     </div>
     <div class="container">
         <table class="table clickable{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
-            <!--<thead>-->
-                <tr class="header">
-                    {{#each fields}}
-                    <th data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
-                        {{name}}
-                        <span class="asc"><i class="fas fa-chevron-up"></i></span>
-                        <span class="desc"><i class="fas fa-chevron-down"></i></span>
-                    </th>
-                    {{/each}}
-                </tr>
-            <!--</thead>-->
-            <!--<tbody>-->
-                <tr class="first"></tr>
-                {{#each records}}
-                <tr data-index="{{@index}}">{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+            <tr class="header">
+                {{#each fields}}
+                <th data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
+                    {{name}}
+                    <span class="asc"><i class="fas fa-chevron-up"></i></span>
+                    <span class="desc"><i class="fas fa-chevron-down"></i></span>
+                </th>
                 {{/each}}
-            <!--</tbody>-->
+            </tr>
+            <tr class="first"></tr>
+            {{#each records}}
+            <tr data-index="{{@index}}">{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+            {{/each}}
         </table>
     </div>
     <div class="status">
@@ -332,6 +331,15 @@
                 <label>
                     <span>Port</span>
                     <input type="text" name="port" value="{{instance.port}}" placeholder="3306" data-default="3306"/>
+                </label>
+                <label class="color">
+                    <span>Color</span>
+                    <input type="radio" name="color" value=""/>
+                    <input type="radio" name="color" class="red" value="red"{{#ifEq instance.color 'red'}} checked="check"{{/ifEq}}/>
+                    <input type="radio" name="color" class="orange" value="orange"{{#ifEq instance.color 'orange'}} checked="check"{{/ifEq}}/>
+                    <input type="radio" name="color" class="blue" value="blue"{{#ifEq instance.color 'blue'}} checked="check"{{/ifEq}}/>
+                    <input type="radio" name="color" class="green" value="green"{{#ifEq instance.color 'green'}} checked="check"{{/ifEq}}/>
+                    <input type="radio" name="color" class="purple" value="purple"{{#ifEq instance.color 'purple'}} checked="check"{{/ifEq}}/>
                 </label>
             </div>
             <div class="ssh" style="display:none;">
