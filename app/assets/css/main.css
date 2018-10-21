@@ -324,7 +324,7 @@ table tr {
 }
 
 table tr td, table tr th {
-    max-width: 100px;
+    max-width: 200px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -427,6 +427,7 @@ table.transpose tr td, table.transpose tr th {
     display: block;
     height: 31px;
     min-width: 100px;
+    max-width: 100%;
 }
 
 table.transpose tr th {
@@ -440,7 +441,31 @@ table.transpose tr th:after {
     border-bottom: 1px solid #ededed;
 }
 
-#workspace .content .terminal, #workspace .content #editor, #workspace .content .CodeMirror, body #workspace .content .editor-container, #workspace .content .results {
+.table-info table th, .table-info table td {
+    border-bottom: 1px solid #ededed;
+}
+
+.table-info table th {
+    font-weight: bold;
+}
+
+.table-info table th:after {
+    border: none;
+}
+
+#workspace .content .table-info .CodeMirror {
+    top: 128px;
+    padding: 10px;
+    height: auto;
+    font-weight: 900;
+}
+
+#workspace .content .terminal,
+#workspace .content
+#editor,
+#workspace .content .CodeMirror,
+body #workspace .content .editor-container,
+#workspace .content .results {
     position: absolute;
     left: 0;
     top: 0;
@@ -455,12 +480,13 @@ body #workspace .content .editor-container {
     border: none;
 }
 
-body #workspace .content .editor-container .CodeMirror {
+body #workspace .content .CodeMirror {
     height: 100%;
     overflow-x: hidden;
     font-family: "Andale Mono", "Monaco", monospace;
     font-size: 10px;
     line-height: 14px;
+    font-weight: 900;
 }
 
 body #workspace .content .editor-container .resize {

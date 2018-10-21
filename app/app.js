@@ -320,6 +320,65 @@ app.database.table = function(table, page, sort, order, filter) {
     app.database.__getTable(data);
 };
 
+app.database.showTableInfo = function() {
+    app.database.__tableinfo = {
+        create: undefined,
+        encoding: undefined,
+        status: undefined
+    };
+    app.database.query("SHOW CREATE TABLE `" + app.database.__tableData.table + "`;", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        app.database.__tableinfo.create = results[0][fields[1].name];
+        app.database.__showTableInfo(app.database.__tableinfo);
+    });
+    app.database.query("SHOW TABLE STATUS LIKE '" + app.database.__tableData.table + "';", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        app.database.__tableinfo.status = results[0];
+        app.database.__showTableInfo(app.database.__tableinfo);
+    });
+    app.database.query("SELECT CCSA.character_set_name FROM information_schema.`TABLES` T, information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA \
+        WHERE CCSA.collation_name = T.table_collation \
+        AND T.table_schema = '" + app.database.__selected + "' \
+        AND T.table_name = '" + app.database.__tableData.table + "';", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        console.log(results.length, results, fields);
+        if (results.length == 1) {
+            app.database.__tableinfo.encoding = results[0][fields[0].name];
+        } else {
+            app.database.__tableinfo.encoding = "Default";
+        }
+        app.database.__showTableInfo(app.database.__tableinfo);
+    });
+};
+
+app.database.__showTableInfo = function(data) {
+    if (!data.create || !data.status || !data.encoding) {
+        return;
+    }
+    html = notulous.util.renderTpl("table-info", data);
+    $("#workspace .content > div").hide();
+    if ($("#workspace .content .table-info").length > 0) {
+        $("#workspace .content .table-info").replaceWith(html);
+        $("#workspace .content .table-info").show();
+    } else {
+        $("#workspace .content").append(html);
+    }
+
+    CodeMirror($("#workspace .content .table-info pre")[0], {
+        value: data.create,
+        mode: "text/x-mysql",
+        keyMap: "sublime",
+        theme: "base16-light",
+        readOnly: true,
+    });
+};
+
 app.database.refreshTable = function() {
     app.database.__getTable(app.database.__tableData);
 };
@@ -797,7 +856,7 @@ app.actions.topMenus = function() {
                 mode: "text/x-mysql",
                 // mode: "sql",
                 keyMap: "sublime",
-                theme: "monokai",
+                theme: "base16-light",
                 indentWithTabs: false,
                 lineWrapping: true,
                 lineNumbers: true,
@@ -847,6 +906,11 @@ app.actions.topMenus = function() {
         app.database.refreshTable();
     });
 
+    $('#workspace .top .buttons.table .info').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        app.database.showTableInfo();
+    });
 
     $('#workspace .top .buttons.table .transpose').on('click', function(e) {
         e.preventDefault();

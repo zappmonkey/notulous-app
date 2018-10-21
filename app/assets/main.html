@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="../assets/css/main.css">
         <link rel="stylesheet" href="../../node_modules/codemirror/lib/codemirror.css">
         <link rel="stylesheet" href="../../node_modules/codemirror/theme/monokai.css">
+        <link rel="stylesheet" href="../../node_modules/codemirror/theme/base16-light.css">
     </head>
     <body style="">
         <div id="notifications"></div>
@@ -51,6 +52,7 @@
         <script type="text/javascript" src="../database.js"></script>
         <script type="text/javascript" src="../app.js"></script>
         <script type="text/javascript" src="../../window.js"></script>
+        <script src="../../node_modules/moment/min/moment.min.js"></script>
         <script src="../../node_modules/codemirror/lib/codemirror.js"></script>
         <script src="../../node_modules/codemirror/mode/sql/sql.js"></script>
         <script src="../../node_modules/codemirror/keymap/sublime.js"></script>
@@ -123,6 +125,42 @@
         </div>
     </div>
 </div>
+</script>
+
+<script type="text/template" id="tpl-table-info">
+    <div class="table-info">
+        <div class="details">
+            <table>
+                <tr>
+                    <th>Created</th><td>{{dateFormat status.Create_time 'YYYY-MM-DD HH:mm:ss'}}</td>
+                    <th>Type</th><td>{{status.Engine}}</td>
+                    <th>Number of rows</th><td>{{status.Rows}}</td>
+                    <th>Data size</th><td>{{filesize status.Data_length}}</td>
+                </tr>
+                <tr>
+                    <th>Modified</th><td>{{dateFormat status.Update_time 'YYYY-MM-DD HH:mm:ss'}}</td>
+                    <th>Encoding</th><td>{{encoding}}</td>
+                    <th>Row format</th><td>{{status.Row_format}}</td>
+                    <th>Max data size</th><td>{{filesize status.Max_data_length}}</td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                    <th>Collation</th><td>{{status.Collation}}</td>
+                    <th>Avg. row length</th><td>{{status.Avg_row_length}}</td>
+                    <th>Index size</th><td>{{filesize status.Index_length}}</td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                    <th>Auto increment</th><td>{{status.Auto_increment}}</td>
+                    <th>Free data size</th><td>{{filesize status.Data_free}}</td>
+                </tr>
+            </table>
+        </div>
+        <pre>
+            <pre></pre>
+        </div>
+    </div>
 </script>
 
 <script type="text/template" id="tpl-database-terminal">

@@ -152,6 +152,9 @@ Handlebars.registerHelper('truncate', function(string, length, append) {
 });
 
 Handlebars.registerHelper('filesize', function(size) {
+    if (notulous.util.empty(size)) {
+        return '0 B';
+    }
     var i = Math.floor( Math.log(size) / Math.log(1024) );
     return ( size / Math.pow(1024, i) ).toFixed(1) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 });
@@ -207,4 +210,16 @@ Handlebars.registerHelper('isInput', function(type, options) {
             return options.fn(this);
     }
     return options.inverse(this);
+});
+
+Handlebars.registerHelper('dateFormat', function(date, format) {
+    if (window.moment) {
+        var f = format || "MMM Do, YYYY";
+        if (!(date instanceof Date)) {
+            date = new Date();
+        }
+        return moment(date).format(f);
+    }else{
+        return date;
+    };
 });
