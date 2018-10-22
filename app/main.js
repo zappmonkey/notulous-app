@@ -5,7 +5,7 @@ const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-// let win
+let openWindows = 0;
 
 function createWindow () {
     // Create the browser window.
@@ -40,8 +40,10 @@ function createWindow () {
         // when you should delete the corresponding element.
         win.destroy();
         win = null
+        openWindows--;
     })
     createMenu();
+    openWindows++;
 };
 
 function createMenu() {
@@ -213,20 +215,21 @@ function createMenu() {
     }];
 
     if (process.platform === 'darwin') {
-    template.unshift({
-      label: "Notulous",
-      submenu: [
-        {role: 'about'},
-        {type: 'separator'},
-        // {role: 'services', submenu: []},
-        // {type: 'separator'},
-        {role: 'hide'},
-        {role: 'hideothers'},
-        {role: 'unhide'},
-        {type: 'separator'},
-        {role: 'quit'}
-      ]
-    })
+        template.unshift({
+            label: "Notulous",
+            submenu: [
+                {role: 'about'},
+                {type: 'separator'},
+                // {role: 'services', submenu: []},
+                // {type: 'separator'},
+                {role: 'hide'},
+                {role: 'hideothers'},
+                {role: 'unhide'},
+                {type: 'separator'},
+                {role: 'quit'}
+            ]
+        }
+    )
 
     // // Edit menu
     // template[1].submenu.push(
@@ -271,7 +274,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (win === null) {
+    if (openWindows <= 0) {
         createWindow()
     }
 })

@@ -347,7 +347,6 @@ app.database.showTableInfo = function() {
         if (err) {
             return app.error(err);
         }
-        console.log(results.length, results, fields);
         if (results.length == 1) {
             app.database.__tableinfo.encoding = results[0][fields[0].name];
         } else {
@@ -377,6 +376,92 @@ app.database.__showTableInfo = function(data) {
         theme: "base16-light",
         readOnly: true,
     });
+};
+
+app.database.getTableStructure = function() {
+    app.database.__tablestructure = {
+        fields: undefined,
+        indexes: undefined,
+        relations: undefined
+    };
+    app.database.query("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '" + app.database.__selected + "' AND TABLE_NAME = '" + app.database.__tableData.table + "';", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        var fields = [];
+        var field;
+        var type;
+        for (var key in results) {
+            type = results[key].COLUMN_TYPE;
+            field = {};
+            field.column = results[key].COLUMN_NAME;
+            field.type = results[key].DATA_TYPE.toUpperCase();
+            field.unsigned = (type.indexOf("unsigned") > 0);
+            field.length = type.substring(type.indexOf('(')+1, type.indexOf(')'));
+            field.key = results[key].COLUMN_KEY;
+            field.nullable = (results[key].IS_NULLABLE == 'YES');
+            field.default = (notulous.util.empty(results[key].COLUMN_DEFAULT) && field.nullable) ? 'NULL' : results[key].COLUMN_DEFAULT;
+            field.extra = results[key].EXTRA;
+            field.encoding = results[key].CHARACTER_SET_NAME;
+            field.collation = results[key].COLLATION_NAME;
+            fields.push(field);
+        }
+        app.database.__tablestructure.fields = fields;
+        app.database.__showTableStructure(app.database.__tablestructure);
+    });
+    app.database.query("SHOW INDEX FROM `" + app.database.__tableData.table + "`;", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        var indexes = [];
+        var index;
+        for (var key in results) {
+            index = {};
+            index.key = results[key].Key_name;
+            index.sequence = results[key].Seq_in_index;
+            index.unique = (results[key].Non_unique == 0);
+            index.column = results[key].Column_name;
+            index.collation = results[key].Collation;
+            index.cardinality = results[key].Cardinality;
+            index.sub_part = results[key].Sub_part;
+            index.packed = results[key].Packed;
+            index.comment = results[key].Comment;
+            indexes.push(index);
+        }
+        app.database.__tablestructure.indexes = indexes;
+        app.database.__showTableStructure(app.database.__tablestructure);
+    });
+    app.database.query("SELECT `TABLE_NAME` AS `table`, `COLUMN_NAME` AS `column`, `REFERENCED_TABLE_NAME` AS `reference_table`, `REFERENCED_COLUMN_NAME` AS `reference_column` \
+                        FROM `information_schema`.`KEY_COLUMN_USAGE` \
+                        WHERE `TABLE_SCHEMA` = '" + app.database.__selected + "' AND `TABLE_NAME` = '" + app.database.__tableData.table + "' AND `REFERENCED_TABLE_NAME` != ' AND `REFERENCED_COLUMN_NAME` != ';", function(err, results, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        var relations = {};
+        for (var key in results) {
+            relations[results[key].column] = {
+                table: results[key].reference_table,
+                column: results[key].reference_column
+            };
+        }
+        app.database.__tablestructure.relations = relations;
+        app.database.__showTableStructure(app.database.__tablestructure);
+    });
+};
+
+app.database.__showTableStructure = function(data) {
+    if (!data.fields || !data.indexes || !data.relations) {
+        return;
+    }
+    console.log(data);
+    html = notulous.util.renderTpl("table-structure", data);
+    $("#workspace .content > div").hide();
+    if ($("#workspace .content .table-structure").length > 0) {
+        $("#workspace .content .table-structure").replaceWith(html);
+        $("#workspace .content .table-structure").show();
+    } else {
+        $("#workspace .content").append(html);
+    }
 };
 
 app.database.refreshTable = function() {
@@ -912,14 +997,21 @@ app.actions.topMenus = function() {
         app.database.showTableInfo();
     });
 
+    $('#workspace .top .buttons.table .structure').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        app.database.getTableStructure();
+    });
+
     $('#workspace .top .buttons.table .transpose').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        $("#workspace .content .table:visible").toggleClass("transpose");
         if ($("#workspace .content .table:visible").hasClass("transpose")) {
-            $('#workspace .top .buttons.table .transpose').addClass('active');
-        } else {
+            $("#workspace .content .table:visible").removeClass("transpose");
             $('#workspace .top .buttons.table .transpose').removeClass('active');
+        } else {
+            $("#workspace .content .table:visible").addClass("transpose");
+            $('#workspace .top .buttons.table .transpose').addClass('active');
         }
     });
 

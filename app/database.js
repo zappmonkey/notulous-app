@@ -7,13 +7,21 @@ database.load = function(instance, callback, close_others) {
         throw "database load instance not defined";
     }
     if (database._has_active_instance(instance)) {
-        var mysql = database.__instances[instance.key].mysql;
-        if (mysql.ping() == 'OK' && callback) {
-            return callback(database.__instances[instance.key].mysql);
+        try {
+            var mysql = database.__instances[instance.key].mysql;
+            if (mysql.ping() == 'OK' && callback) {
+                return callback(database.__instances[instance.key].mysql);
+            }
+        } catch(e) {
+            console.log(err);
         }
     }
     if (close_others) {
-        database.closeAll();
+        try {
+            database.closeAll();
+        } catch(e) {
+            console.log(err);
+        }
     }
     if (instance.type == 'sql') {
         var mysql = require('mysql2');
@@ -98,8 +106,5 @@ database._mysql_config = function(instance) {
     if (!notulous.util.empty(instance.password)) {
         con.password = instance.password;
     }
-    // if (!notulous.util.empty(instance.key)) {
-    //     con.privateKey = fs.readFileSync(instance.key);
-    // }
     return con;
 };

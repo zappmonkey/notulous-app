@@ -40,7 +40,7 @@
                 <div class="buttons table">
                     <label></label>
                     <div class="button filter"><i class="fas fa-filter"></i></div>
-                    <div class="button wrench"><i class="fas fa-wrench"></i></div>
+                    <div class="button structure"><i class="fas fa-wrench"></i></div>
                     <div class="button info"><i class="fas fa-info"></i></div>
                     <div class="button refresh"><i class="fas fa-sync-alt"></i></div>
                     <div class="button transpose"><i class="fas fa-retweet"></i></div>
@@ -159,6 +159,63 @@
         </div>
         <pre>
             <pre></pre>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl-table-structure">
+    <div class="table-structure">
+        <div class="container">
+            <table>
+                <tr class="header">
+                    <th>column</th>
+                    <th>type</th>
+                    <th>length</th>
+                    <th>unsigned</th>
+                    <th>nullable</th>
+                    <th>default</th>
+                    <th>encoding</th>
+                    <th>collation</th>
+                    <th>extra</th>
+                </tr>
+                {{#each fields}}
+                <tr data-index="{{@index}}">
+                    <td>{{column}}</td>
+                    <td>{{type}}</td>
+                    <td>{{length}}</td>
+                    <td>{{unsigned}}</td>
+                    <td>{{nullable}}</td>
+                    <td>{{default}}</td>
+                    <td>{{encoding}}</td>
+                    <td>{{collation}}</td>
+                    <td>{{extra}}</td>
+                </tr>
+                {{/each}}
+            </table>
+            <table class="table">
+                <tr class="header">
+                    <th>key</th>
+                    <th>unique</th>
+                    <th>sequence</th>
+                    <th>column</th>
+                    <th>collation</th>
+                    <th>cardinality</th>
+                    <th>sub_part</th>
+                    <th>packed</th>
+                </tr>
+                {{#each indexes}}
+                <tr data-index="{{@index}}">
+                    <td>{{key}}</td>
+                    <td>{{unique}}</td>
+                    <td>{{sequence}}</td>
+                    <td>{{column}}</td>
+                    <td>{{collation}}</td>
+                    <td>{{cardinality}}</td>
+                    <td>{{sub_part}}</td>
+                    <td>{{packed}}</td>
+                </tr>
+                {{/each}}
+            </table>
         </div>
     </div>
 </script>
