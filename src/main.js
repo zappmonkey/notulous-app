@@ -23,9 +23,9 @@ function createWindow () {
         win.show()
     })
 
-    // and load the index.html of the app.
+    // and load the index.html of the src.
     win.loadURL(url.format({
-        pathname: path.join(__dirname, 'assets/main.html'),
+        pathname: path.join(__dirname, '../assets/main.html'),
         protocol: 'file:',
         slashes: true
     }))
@@ -36,7 +36,7 @@ function createWindow () {
     // Emitted when the window is closed.
     win.on('closed', () => {
         // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
+        // in an array if your src supports multi windows, this is the time
         // when you should delete the corresponding element.
         win.destroy();
         win = null
@@ -272,12 +272,12 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
+    // On macOS it's common to re-create a window in the src when the
     // dock icon is clicked and there are no other windows open.
     if (openWindows <= 0) {
         createWindow()
     }
 })
 
-// In this file you can include the rest of your app's specific main process
+// In this file you can include the rest of your src's specific main process
 // code. You can also put them in separate files and require them here.

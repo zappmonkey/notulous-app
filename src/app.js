@@ -1119,7 +1119,7 @@ app.search.all = function() {
                     }
                 }
                 list.find("li:not(.title)").last().addClass('focussed');
-                // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                // src.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
                 break;
             // down
             case 40:
@@ -1130,12 +1130,12 @@ app.search.all = function() {
                     focussed.removeClass('focussed');
                     if (next.length == 1) {
                         next.addClass('focussed');
-                        // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                        // src.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
                         break;
                     }
                 }
                 list.find("li:not(.title)").first().addClass('focussed');
-                // app.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
+                // src.view.elementVisible(list, list.find("li.focussed"), list.find(".search").outerHeight());
                 break;
         }
         if (app.search.__allHandled) {
