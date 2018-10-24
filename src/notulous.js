@@ -189,18 +189,21 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
     return null;
 });
 
-Handlebars.registerHelper('foreignKey', function(relations, fields, index) {
+Handlebars.registerHelper('recordValue', function(relations, fields, index, value) {
+    if (value === null) {
+        return new Handlebars.SafeString("<em>NULL</em>");
+    }
     if (!relations || relations.length == 0) {
-        return null;
+        return value;
     }
     if (!fields[index]) {
-        return null;
+        return value;
     }
     var field = fields[index].name;
     if (!relations[field]) {
-        return null;
+        return value;
     }
-    return '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>';
+    return new Handlebars.SafeString(value + '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>');
 });
 
 

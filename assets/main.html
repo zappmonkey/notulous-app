@@ -120,7 +120,7 @@
             </tr>
             <tr class="first"></tr>
             {{#each records}}
-            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{this}}{{{foreignKey @root.relations @root.fields @index}}}</td>{{/each}}</tr>
+            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{recordValue @root.relations @root.fields @index this}}</td>{{/each}}</tr>
             {{/each}}
         </table>
     </div>

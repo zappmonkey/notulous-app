@@ -363,6 +363,11 @@ table tr td .has-foreign svg {
     padding: 2px;
 }
 
+table tr td em {
+    color: #bbb;
+    font-style: normal;
+}
+
 table.clickable tbody tr:not(.header):hover {
     background: rgba(0, 0, 0, 0.12);
 }

@@ -226,6 +226,7 @@ app.database.table.__get = function(data)
 
             data.fields = fields;
             data.records = records;
+            console.log(records);
             app.database.table.__records[data.table] = records;
             var length = data.records.length;
             data.end = data.start + length;
@@ -277,7 +278,6 @@ app.database.table.__get = function(data)
             });
 
             $("#workspace .content .table." + data.hash + " tbody tr td .has-foreign").on("click", function(e) {
-                console.log($(this));
                 e.preventDefault();
                 e.stopPropagation();
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
