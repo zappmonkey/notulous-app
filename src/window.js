@@ -40,7 +40,7 @@ ipcRenderer.on('table-filter', function() {
 });
 
 ipcRenderer.on('table-reload', function() {
-    app.database.refreshTable();
+    app.database.table.refresh();
 });
 
 ipcRenderer.on('run-queries', function() {

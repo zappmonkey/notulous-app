@@ -135,7 +135,7 @@ app.search.all = function() {
                     editorQuery += '\n';
                 }
                 app.__editor.setValue(editorQuery + query);
-                app.database.runCustomQuery(query);
+                app.instance.customQuery(query);
                 break;
             case "command":
                 console.log("run command", $(this).data("value"));
@@ -147,7 +147,7 @@ app.search.all = function() {
                 app.database.set($(this).text());
                 break;
             case "table":
-                app.database.table($(this).text());
+                app.database.table.get($(this).text());
                 break;
         }
         $("#search-all").remove();

@@ -28,7 +28,7 @@ app.actions.databases = function() {
 app.actions.tables = function() {
     $("#list .content .search input").focus();
     $('#list .tables li').on('click', function(e) {
-        app.database.table(
+        app.database.table.get(
             $(this).data('table')
         );
     });
@@ -52,8 +52,8 @@ app.actions.tableFilter = function() {
     });
     $("#workspace .content .table:visible .filters a.clear").on('click', function(e) {
         var data = $(this).closest(".table").find("table").data();
-        app.database.__tableData.filter = undefined;
-        app.database.table(
+        app.database.table.__data.filter = undefined;
+        app.database.table.get(
             data.table,
             data.page,
             data.sort,
@@ -71,7 +71,7 @@ app.actions.tableFilter = function() {
             $("#workspace .content .table:visible .filters [name='value2']").val()
         );
         var data = $("#workspace .content .table:visible table").data();
-        app.database.table(
+        app.database.table.get(
             data.table,
             undefined,
             data.sort,
@@ -123,7 +123,7 @@ app.actions.workspace = function() {
                 editorQuery += '\n';
             }
             app.__editor.setValue(editorQuery + query);
-            app.database.runCustomQuery(query);
+            app.instance.customQuery(query);
         });
     });
 };
@@ -147,7 +147,7 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
 
-        app.database.databases();
+        app.instance.databases();
     });
 
     $('#workspace .top .database .terminal').on('click', function(e) {
@@ -188,7 +188,7 @@ app.actions.topMenus = function() {
         e.stopPropagation();
 
         $("#workspace .content > div").hide();
-        $("#workspace .content .table." + app.database.__tableData.table).show();
+        $("#workspace .content .table." + app.database.table.__data.table).show();
         $("#workspace .top .buttons.table").show();
         $("#workspace .top .buttons.terminal").hide();
     });
@@ -196,7 +196,9 @@ app.actions.topMenus = function() {
     $('#workspace .top .buttons.table .filter').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-
+        if ($("#workspace .content .table:visible .filters").length <= 0) {
+            return;
+        }
         if ($("#workspace .content .table:visible .filters").html().trim() != "") {
             $("#workspace .content .table:visible .filters").html("");
             $("#workspace .content .table:visible .container").css({top: 0});
@@ -205,7 +207,7 @@ app.actions.topMenus = function() {
         }
         $("#workspace .content .table:visible .filters").html(
             notulous.util.renderTpl("filter", {
-                columns: app.database.tableColumns($("#workspace .content .table:visible table").data("table"))
+                columns: app.database.table.columns($("#workspace .content .table:visible table").data("table"))
             })
         );
         app.actions.tableFilter();
@@ -214,19 +216,19 @@ app.actions.topMenus = function() {
     $('#workspace .top .buttons.table .refresh').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        app.database.refreshTable();
+        app.database.table.refresh();
     });
 
     $('#workspace .top .buttons.table .info').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        app.database.showTableInfo();
+        app.database.table.info();
     });
 
     $('#workspace .top .buttons.table .structure').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        app.database.getTableStructure();
+        app.database.table.structure();
     });
 
     $('#workspace .top .buttons.table .transpose').on('click', function(e) {
@@ -245,7 +247,7 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
 
-        app.database.getAndRunCustomQuery();
+        app.view.getAndRunCustomQuery();
     });
 
     $('#menu .resize, #list .resize').on('mousedown', function(e) {
