@@ -5,7 +5,16 @@ app.database = app.database || {};
 app.database.table = {
     __data: undefined,
     __records: {},
-    __columns: []
+    __columns: [],
+    __structure: []
+};
+
+app.database.table.reset = function()
+{
+    app.database.table.__data = undefined;
+    app.database.table.__records = {};
+    app.database.table.__columns = [];
+    app.database.table.__structure = [];
 };
 
 app.database.table.get = function(table, page, sort, order, filter) {
@@ -21,29 +30,29 @@ app.database.table.get = function(table, page, sort, order, filter) {
         app.database.table.__data = $("#workspace .content .table." + table + " table").data();
         return;
     }
-
-    app.database.table.columns(table);
-
-    var data = {
-        table: table,
-        filter: filter,
-        sort: sort,
-        order: order,
-        limit: 1000,
-        query: "SELECT * FROM" + " `" + table + "`"
-    };
-    if (data.filter) {
-        data.query += " WHERE " + data.filter;
-    }
-    data.page = page ? page : 1;
-    data.start = data.page - 1;
-    data.start = data.start * data.limit;
-    data.hash = crypt.createHash('md5').update(JSON.stringify(data)).digest('hex');
-    if (sort && order) {
-        data.query += " ORDER BY `" + sort + "` " + order;
-    }
-    data.query += " LIMIT " + data.start + ", " + data.limit + ";";
-    app.database.table.__get(data);
+    app.database.table.structure(table, function(structure) {
+        app.database.table.columns(table);
+        var data = {
+            table: table,
+            filter: filter,
+            sort: sort,
+            order: order,
+            limit: 1000,
+            query: "SELECT * FROM" + " `" + table + "`"
+        };
+        if (data.filter) {
+            data.query += " WHERE " + data.filter;
+        }
+        data.page = page ? page : 1;
+        data.start = data.page - 1;
+        data.start = data.start * data.limit;
+        data.hash = crypt.createHash('md5').update(JSON.stringify(data)).digest('hex');
+        if (sort && order) {
+            data.query += " ORDER BY `" + sort + "` " + order;
+        }
+        data.query += " LIMIT " + data.start + ", " + data.limit + ";";
+        app.database.table.__get(data);
+    });
 };
 
 app.database.table.info = function() {
@@ -82,13 +91,32 @@ app.database.table.info = function() {
     });
 };
 
-app.database.table.structure = function() {
-    app.database.__tablestructure = {
+
+
+app.database.table.structure = function(table, callback)
+{
+    if (!table) {
+        table = app.database.table.__data.table;
+    }
+
+    if (!callback || typeof callback  !== "function") {
+        callback = app.view.showTableStructure;
+    }
+
+    var structure;
+    if (!notulous.util.empty(app.database.table.__structure[table])) {
+        structure = app.database.table.__structure[table];
+        callback(structure);
+        return;
+    }
+
+    structure = {
         fields: undefined,
         indexes: undefined,
         relations: undefined
     };
-    app.instance.query("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '" + app.database.__selected + "' AND TABLE_NAME = '" + app.database.table.__data.table + "';", function(err, results, fields) {
+
+    app.instance.query("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '" + app.database.__selected + "' AND TABLE_NAME = '" + table + "';", function(err, results, fields) {
         if (err) {
             return app.error(err);
         }
@@ -110,10 +138,13 @@ app.database.table.structure = function() {
             field.collation = results[key].COLLATION_NAME;
             fields.push(field);
         }
-        app.database.__tablestructure.fields = fields;
-        app.view.showTableStructure(app.database.__tablestructure);
+        structure.fields = fields;
+        if (structure.fields && structure.indexes && structure.relations) {
+            app.database.table.__structure[table] = structure;
+            callback(structure);
+        }
     });
-    app.instance.query("SHOW INDEX FROM `" + app.database.table.__data.table + "`;", function(err, results, fields) {
+    app.instance.query("SHOW INDEX FROM `" + table + "`;", function(err, results, fields) {
         if (err) {
             return app.error(err);
         }
@@ -132,12 +163,15 @@ app.database.table.structure = function() {
             index.comment = results[key].Comment;
             indexes.push(index);
         }
-        app.database.__tablestructure.indexes = indexes;
-        app.view.showTableStructure(app.database.__tablestructure);
+        structure.indexes = indexes;
+        if (structure.fields && structure.indexes && structure.relations) {
+            app.database.table.__structure[table] = structure;
+            callback(structure);
+        }
     });
     app.instance.query("SELECT `TABLE_NAME` AS `table`, `COLUMN_NAME` AS `column`, `REFERENCED_TABLE_NAME` AS `reference_table`, `REFERENCED_COLUMN_NAME` AS `reference_column` \
                         FROM `information_schema`.`KEY_COLUMN_USAGE` \
-                        WHERE `TABLE_SCHEMA` = '" + app.database.__selected + "' AND `TABLE_NAME` = '" + app.database.table.__data.table + "' AND `REFERENCED_TABLE_NAME` != ' AND `REFERENCED_COLUMN_NAME` != ';", function(err, results, fields) {
+                        WHERE `TABLE_SCHEMA` = '" + app.database.__selected + "' AND `TABLE_NAME` = '" + table + "' AND `REFERENCED_TABLE_NAME` != ' AND `REFERENCED_COLUMN_NAME` != ';", function(err, results, fields) {
         if (err) {
             return app.error(err);
         }
@@ -148,8 +182,11 @@ app.database.table.structure = function() {
                 column: results[key].reference_column
             };
         }
-        app.database.__tablestructure.relations = relations;
-        app.view.showTableStructure(app.database.__tablestructure);
+        structure.relations = relations;
+        if (structure.fields && structure.indexes && structure.relations) {
+            app.database.table.__structure[table] = structure;
+            callback(structure);
+        }
     });
 };
 
@@ -208,6 +245,8 @@ app.database.table.__get = function(data)
                 filterHTML.find("[name=filter]").val($("#workspace .content .table:visible .filters [name=filter]").val());
             }
             data.transposed = app.database.table.transposed();
+            data.relations = app.database.table.__structure[data.table].relations;
+            console.log(data.relations);
             html = notulous.util.renderTpl("table", data);
             data.records = undefined;
             app.database.table.__data = data;
@@ -236,6 +275,14 @@ app.database.table.__get = function(data)
                     data.filter
                 );
             });
+
+            $("#workspace .content .table." + data.hash + " tbody tr td .has-foreign").on("click", function(e) {
+                console.log($(this));
+                e.preventDefault();
+                e.stopPropagation();
+                app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
+            });
+
             $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
                 var index = $(this).data('index');
                 var el = $(this).closest("table");

@@ -232,6 +232,9 @@ app.actions.topMenus = function() {
     });
 
     $('#workspace .top .buttons.table .transpose').on('click', function(e) {
+        if ($("#workspace .content .table:visible").length <= 0) {
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
         if ($("#workspace .content .table:visible").hasClass("transpose")) {

@@ -3,16 +3,18 @@ var app = app || {};
 app.search = {
     __allHandled: false
 };
-app.search.all = function() {
+app.search.all = function()
+{
     if ($("#search-all").length > 0) {
         return $("#search-all").remove();
     }
     $("body").append(notulous.util.renderTpl("search-all"));
 
     $("#search-all input").focus();
-    // $("#search-all input").on('blur', function() {
-    //     $("#search-all").remove();
-    // });
+
+    $("#search-all input").on('blur', function() {
+        $("#search-all").remove();
+    });
 
     $("#search-all input").on('keydown', function(e) {
         app.search.__allHandled = false;
@@ -97,10 +99,11 @@ app.search.all = function() {
             hasResult = true;
         }
         if (!hasResult) {
-            for (var key in app.config()['instances']) {
-                if (notulous.util.fuzzyCompare(query, key, true)) {
+            var instances = app.config()['instances'];
+            for (var key in instances) {
+                if (notulous.util.fuzzyCompare(query, instances[key].name, true)) {
                     hasResult = true;
-                    data.instances.push(key);
+                    data.instances.push(instances[key]);
                 }
             }
             $("#menu .content ul.databases li").each(function() {
@@ -141,13 +144,13 @@ app.search.all = function() {
                 console.log("run command", $(this).data("value"));
                 break;
             case "instance":
-                app.instance.set($(this).text());
+                app.instance.set($(this).data("key"));
                 break;
             case "database":
-                app.database.set($(this).text());
+                app.database.set($(this).data("key"));
                 break;
             case "table":
-                app.database.table.get($(this).text());
+                app.database.table.get($(this).data("key"));
                 break;
         }
         $("#search-all").remove();

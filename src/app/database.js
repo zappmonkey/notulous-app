@@ -7,6 +7,7 @@ app.database = {
 app.database.set = function(database)
 {
     app.database.tables(database);
+    app.database.table.reset();
     $("#list .top label").html("<i class='fas fa-database'></i>" + database);
     $("#workspace .content .table").remove();
     $("#workspace .content > div").hide();

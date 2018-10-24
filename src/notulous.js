@@ -189,6 +189,21 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
     return null;
 });
 
+Handlebars.registerHelper('foreignKey', function(relations, fields, index) {
+    if (!relations || relations.length == 0) {
+        return null;
+    }
+    if (!fields[index]) {
+        return null;
+    }
+    var field = fields[index].name;
+    if (!relations[field]) {
+        return null;
+    }
+    return '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>';
+});
+
+
 Handlebars.registerHelper('isInput', function(type, options) {
     // console.log(type);
     type = type.toLowerCase();

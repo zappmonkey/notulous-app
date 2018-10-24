@@ -169,6 +169,12 @@ body #workspace {
     background: #f9f9f9;
 }
 
+body #workspace .actions {
+    height: 30px;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+}
+
 body #workspace .container {
     position: absolute;
     left: 0;
@@ -344,6 +350,17 @@ table tr th {
     cursor: default;
     user-select: none;
     border-bottom: none;
+}
+
+table tr td .has-foreign {
+    float: right;
+    color: #aaa;
+    cursor: pointer;
+}
+
+table tr td .has-foreign svg {
+    font-size: 13px;
+    padding: 2px;
 }
 
 table.clickable tbody tr:not(.header):hover {

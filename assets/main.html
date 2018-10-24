@@ -120,7 +120,7 @@
             </tr>
             <tr class="first"></tr>
             {{#each records}}
-            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{this}}</td>{{/each}}</tr>
+            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{this}}{{{foreignKey @root.relations @root.fields @index}}}</td>{{/each}}</tr>
             {{/each}}
         </table>
     </div>
@@ -201,6 +201,9 @@
                 </tr>
                 {{/each}}
             </table>
+            <div class="actions">
+
+            </div>
             <table>
                 <tr class="header">
                     <th>key</th>
@@ -375,21 +378,21 @@
     {{#if instances }}
     <li class="title"><i class="fas fa-server"></i>Instances</li>
     {{#each instances}}
-    <li data-type="instance">{{this}}</li>
+    <li data-type="instance" data-key="{{key}}">{{name}}</li>
     {{/each}}
     {{/if}}
 
     {{#if databases }}
     <li class="title"><i class="fas fa-database"></i>Database</li>
     {{#each databases}}
-    <li data-type="database">{{this}}</li>
+    <li data-type="database" data-key="{{this}}">{{this}}</li>
     {{/each}}
     {{/if}}
 
     {{#if tables }}
     <li class="title"><i class="fas fa-table"></i>Table</li>
     {{#each tables}}
-    <li data-type="table">{{this}}</li>
+    <li data-type="table" data-key="{{this}}">{{this}}</li>
     {{/each}}
     {{/if}}
 </ul>
