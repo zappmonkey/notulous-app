@@ -205,6 +205,7 @@ app.database = {
     __lastCustomQuery: undefined,
     __tableData: undefined,
     __data: undefined,
+    __records: {},
     __columns: []
 };
 
@@ -290,9 +291,10 @@ app.database.table = function(table, page, sort, order, filter) {
     $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
     $("#workspace .top .buttons.table").show();
     $('#list .tables li[data-table="' + table + '"]').addClass('active');
-    if ($("#workspace .content .table." + table).length > 0 && $("#workspace .content .table." + table).data("sort") == sort && $("#workspace .content .table." + table).data("order") == order && $("#workspace .content .table." + table).data("page") == page) {
+    if ($("#workspace .content .table." + table).length > 0 && $("#workspace .content .table." + table).data("sort") == sort && $("#workspace .content .table." + table).data("order") == order && $("#workspace .content .table." + table).data("page") == page && app.database.__records[table] != undefined) {
         $("#workspace .content > div").hide();
-        $("#workspace .content .table." +table).show();
+        $("#workspace .content .table." + table).show();
+        app.database.__tableData = $("#workspace .content .table." + table + " table").data();
         return;
     }
 
@@ -453,7 +455,6 @@ app.database.__showTableStructure = function(data) {
     if (!data.fields || !data.indexes || !data.relations) {
         return;
     }
-    console.log(data);
     html = notulous.util.renderTpl("table-structure", data);
     $("#workspace .content > div").hide();
     if ($("#workspace .content .table-structure").length > 0) {
@@ -497,6 +498,7 @@ app.database.__getTable = function(data) {
 
             data.fields = fields;
             data.records = records;
+            app.database.__records[data.table] = records;
             var length = data.records.length;
             data.end = data.start + length;
             if (data.page > 1) {
@@ -506,7 +508,6 @@ app.database.__getTable = function(data) {
                 data.next = data.page + 1;
             }
             data.start += 1;
-            app.database.__tableData = data;
             var filterHTML;
             var filters = $("#workspace .content .table:visible .filters").length;
             var html = $("#workspace .content .table:visible .filters").length > 0 ? $("#workspace .content .table:visible .filters").html().trim() : undefined;
@@ -517,6 +518,8 @@ app.database.__getTable = function(data) {
             }
             data.transposed = app.database.tableTransposed();
             html = notulous.util.renderTpl("table", data);
+            data.records = undefined;
+            app.database.__tableData = data;
             $("#workspace .content > div").hide();
             if ($("#workspace .content .table." + data.table).length > 0) {
                 $("#workspace .content .table." + data.table).replaceWith(html);
@@ -550,7 +553,7 @@ app.database.__getTable = function(data) {
                     maxheight: $(window).height()-250,
                     table: table,
                     columns: app.database.tableColumns(table),
-                    record: app.database.__tableData.records[index]
+                    record: app.database.__records[table][index]
                 };
                 $("body").append(
                     notulous.util.renderTpl("record", data)

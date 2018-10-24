@@ -99,10 +99,10 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
+        <table class="table clickable{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-query="{{query}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
             <tr class="header">
                 {{#each fields}}
-                <th data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
+                <th data-index="{{@index}}" data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
                     {{name}}
                     <span class="asc"><i class="fas fa-chevron-up"></i></span>
                     <span class="desc"><i class="fas fa-chevron-down"></i></span>
@@ -111,7 +111,7 @@
             </tr>
             <tr class="first"></tr>
             {{#each records}}
-            <tr data-index="{{@index}}">{{#each this}}<td>{{this}}</td>{{/each}}</tr>
+            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{this}}</td>{{/each}}</tr>
             {{/each}}
         </table>
     </div>
@@ -192,7 +192,7 @@
                 </tr>
                 {{/each}}
             </table>
-            <table class="table">
+            <table>
                 <tr class="header">
                     <th>key</th>
                     <th>unique</th>
