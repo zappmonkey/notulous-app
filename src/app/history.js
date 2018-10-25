@@ -1,9 +1,11 @@
 var app = app || {};
 
 app.history = {
-    maxLength: 1000,
+    maxLength: 1000
 };
-app.history.add = function(query) {
+
+app.history.add = function(query)
+{
     var history = notulous.storage.get('history');
     if (!history) {
         history = [];

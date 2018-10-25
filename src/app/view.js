@@ -113,3 +113,17 @@ app.view.getAndRunCustomQuery = function() {
         $("#overlay").remove();
     });
 };
+
+app.view.checkQueryNavigation = function()
+{
+    if (app.session.hasNext()) {
+        $("#workspace .top .next").show();
+    } else {
+        $("#workspace .top .next").hide();
+    }
+    if (app.session.hasPrevious()) {
+        $("#workspace .top .previous").show();
+    } else {
+        $("#workspace .top .previous").hide();
+    }
+};

@@ -214,6 +214,7 @@ app.database.table.columns = function(table, force)
 
 app.database.table.__get = function(data)
 {
+    app.session.add('table', data);
     app.instance.query("SHOW TABLE STATUS WHERE `Name` = '" + data.table + "';" , function (err, records, fields) {
         if (err) {
             return app.error(err);
@@ -226,7 +227,6 @@ app.database.table.__get = function(data)
 
             data.fields = fields;
             data.records = records;
-            console.log(records);
             app.database.table.__records[data.table] = records;
             var length = data.records.length;
             data.end = data.start + length;
@@ -247,7 +247,7 @@ app.database.table.__get = function(data)
             }
             data.transposed = app.database.table.transposed();
             data.relations = app.database.table.__structure[data.table].relations;
-            console.log(data.relations);
+            app.view.checkQueryNavigation();
             html = notulous.util.renderTpl("table", data);
             data.records = undefined;
             app.database.table.__data = data;

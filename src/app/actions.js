@@ -22,6 +22,7 @@ app.actions.databases = function() {
         app.database.set(
             $(this).data('database')
         );
+        app.session.reset();
     });
 };
 
@@ -211,6 +212,30 @@ app.actions.topMenus = function() {
             })
         );
         app.actions.tableFilter();
+    });
+
+    $('#workspace .top .previous').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var item = app.session.getPrevious();
+        console.log(item);
+        if (item.type == 'table') {
+            app.database.table.__get(item.data);
+        } else {
+            app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+        }
+     });
+
+    $('#workspace .top .next').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var item = app.session.getNext();
+        console.log(item);
+        if (item.type == 'table') {
+            app.database.table.__get(item.data);
+        } else {
+            app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+        }
     });
 
     $('#workspace .top .buttons.table .refresh').on('click', function(e) {

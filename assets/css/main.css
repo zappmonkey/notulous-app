@@ -224,6 +224,11 @@ body #workspace .status .button {
     padding: 7px;
 }
 
+#workspace .top .spacer {
+    display: inline-block;
+    width: 20px;
+}
+
 body #menu .content, body #list .content, body #workspace .content {
     position: absolute;
     top: 38px;

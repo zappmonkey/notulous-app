@@ -207,16 +207,24 @@ app.instance.databases = function(database) {
     });
 };
 
-app.instance.query = function(query, callback) {
-    if (app.__mysql == undefined) {
-
-    } else {
+app.instance.query = function(query, callback)
+{
+    if (app.__mysql != undefined) {
         app.history.add(query);
         app.__mysql.query(query, callback)
+    } else {
+        app.notification.add("No active connection", "Unable to execute query because there is no active connection.", "error");
     }
 };
 
-app.instance.customQuery = function(query, sort, order) {
+app.instance.customQuery = function(query, sort, order)
+{
+    app.session.add('custom', {
+        query: query,
+        sort: sort,
+        order: order
+    });
+
     if (sort && order) {
         // var originalQuery = query;
         var lcQuery = query.toLowerCase();
@@ -253,8 +261,9 @@ app.instance.customQuery = function(query, sort, order) {
             fields: fields,
             records: records,
             sort: sort,
-            order: order
+            order: order,
         };
+        app.view.checkQueryNavigation();
         $("#workspace .content .results").html(
             notulous.util.renderTpl("table", data)
         );

@@ -20,7 +20,7 @@ app.init = function() {
 app.error = function(err) {
     app.notification.add("Error in query", err.message, "error");
     return err.message;
-}
+};
 
 app.config = function() {
     if (!app.__config) {
