@@ -578,7 +578,7 @@ body #workspace .content .filters .actions .icon {
     vertical-align: middle;
 }
 
-body #workspace .content .filters .actions .button {
+body #workspace .content .filters .actions .save {
     float: right;
 }
 

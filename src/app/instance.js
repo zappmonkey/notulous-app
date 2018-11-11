@@ -211,7 +211,7 @@ app.instance.query = function(query, callback)
 {
     if (app.__mysql != undefined) {
         app.history.add(query);
-        app.__mysql.query(query, callback)
+        app.__mysql.query(query, callback);
     } else {
         app.notification.add("No active connection", "Unable to execute query because there is no active connection.", "error");
     }
