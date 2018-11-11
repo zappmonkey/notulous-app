@@ -79,6 +79,15 @@ app.view.showTableStructure = function(data)
     }
 };
 
+app.view.setTableName = function(table)
+{
+    $('#list .tables li.active').removeClass('active');
+    $("#workspace .top .buttons").not(".database").hide();
+    $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
+    $("#workspace .top .buttons.table").show();
+    $('#list .tables li[data-table="' + table + '"]').addClass('active');
+};
+
 app.view.getAndRunCustomQuery = function() {
     var queries = app.database.terminal.get();
     var hasSelection = false;

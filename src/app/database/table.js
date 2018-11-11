@@ -17,13 +17,9 @@ app.database.table.reset = function()
     app.database.table.__structure = [];
 };
 
-app.database.table.get = function(table, page, sort, order, filter) {
-
-    $('#list .tables li.active').removeClass('active');
-    $("#workspace .top .buttons").not(".database").hide();
-    $("#workspace .top .buttons.table label").html("<i class='fas fa-table'></i>" + table);
-    $("#workspace .top .buttons.table").show();
-    $('#list .tables li[data-table="' + table + '"]').addClass('active');
+app.database.table.get = function(table, page, sort, order, filter)
+{
+    app.view.setTableName(table);
     if ($("#workspace .content .table." + table).length > 0 && $("#workspace .content .table." + table).data("sort") == sort && $("#workspace .content .table." + table).data("order") == order && $("#workspace .content .table." + table).data("page") == page && app.database.table.__records[table] != undefined) {
         $("#workspace .content > div").hide();
         $("#workspace .content .table." + table).show();
@@ -55,7 +51,8 @@ app.database.table.get = function(table, page, sort, order, filter) {
     });
 };
 
-app.database.table.info = function() {
+app.database.table.info = function()
+{
     app.database.__tableinfo = {
         create: undefined,
         encoding: undefined,
@@ -195,7 +192,8 @@ app.database.table.refresh = function()
     app.database.table.__get(app.database.table.__data);
 };
 
-app.database.table.transposed = function() {
+app.database.table.transposed = function()
+{
     return $("#workspace .top .buttons.table .transpose").hasClass("active");
 };
 

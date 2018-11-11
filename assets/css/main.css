@@ -113,7 +113,7 @@ body #menu {
     float: right;
 }
 
-.button {
+.button, .spacer {
     display: inline-block;
     padding: 12px 6px;
     width: 30px;
@@ -121,6 +121,10 @@ body #menu {
     color: #fff;
     opacity: 0.5;
     transition: all 0.3s;
+}
+
+.spacer {
+    width: 20px;
 }
 
 .button:hover {
@@ -146,6 +150,13 @@ body #list label, body #workspace label {
     color: #999;
     text-shadow: 0 1px 1px #fff;
     margin-right: 20px;
+}
+
+body #workspace label {
+    text-align: left;
+    width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 body #list label svg, body #workspace label svg {
@@ -222,11 +233,6 @@ body #workspace .button.active {
 
 body #workspace .status .button {
     padding: 7px;
-}
-
-#workspace .top .spacer {
-    display: inline-block;
-    width: 20px;
 }
 
 body #menu .content, body #list .content, body #workspace .content {

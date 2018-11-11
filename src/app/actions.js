@@ -133,8 +133,7 @@ app.actions.topMenus = function() {
     $(".top").on("dblclick", function(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        window.maximize();
+        remote.getCurrentWindow().maximize();
     });
 
     $('#menu .top .button.instances-but').on('click', function(e) {
@@ -218,11 +217,14 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
         var item = app.session.getPrevious();
-        console.log(item);
-        if (item.type == 'table') {
-            app.database.table.__get(item.data);
-        } else {
-            app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+        switch (item.type) {
+            case 'table':
+                app.view.setTableName(item.data.table);
+                app.database.table.__get(item.data);
+                break;
+            default:
+                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+                break;
         }
      });
 
@@ -230,11 +232,14 @@ app.actions.topMenus = function() {
         e.preventDefault();
         e.stopPropagation();
         var item = app.session.getNext();
-        console.log(item);
-        if (item.type == 'table') {
-            app.database.table.__get(item.data);
-        } else {
-            app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+        switch (item.type) {
+            case 'table':
+                app.view.setTableName(item.data.table);
+                app.database.table.__get(item.data);
+                break;
+            default:
+                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+                break;
         }
     });
 
