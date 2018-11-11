@@ -133,7 +133,7 @@ body #menu {
 
 .button.active {
     opacity: 1;
-    color: #257fe0;
+    color: #fff;
 }
 
 body #list {
@@ -539,30 +539,60 @@ body #workspace .content .results {
 }
 
 body #workspace .content .filters {
-    padding: 8px 10px;
     overflow: hidden;
     background: #fdfdfd;
     display: none;
 }
 
 body #workspace .content .filters .query {
-    float: left;
+    width: 100%;
+    margin: 8px;
+    user-select: none;
+}
+
+body #workspace .content .filters .query-tpl {
+    display: none;
 }
 
 body #workspace .content .filters .actions {
+    width: 100%;
+    padding: 2px 8px 8px;
+    margin: 0;
+    height: 36px;
+    user-select: none;
+}
+
+body #workspace .content .filters .icon {
+    color: #999;
+}
+
+body #workspace .content .filters .icon:hover {
+    color: #333;
+}
+
+body #workspace .content .filters .icon.remove:hover {
+    color: #a00;
+}
+
+body #workspace .content .filters .actions .icon {
+    vertical-align: middle;
+}
+
+body #workspace .content .filters .actions .button {
     float: right;
 }
 
-body #workspace .content .filters .select {
+body #workspace .content .filters .select, body #workspace .content .filters input {
     display: inline-block;
     position: relative;
+    width: 140px;
 }
 
 body #workspace .content .filters .select select {
     -webkit-appearance: none;
     padding: 4px 28px 5px 8px;
-    border: 1px solid #aaa;
-    border-radius: 2px;
+    border: 1px solid #ccc;
+    border-radius: 0px;
     background: none;
     min-width: 140px;
     position: relative;
@@ -577,12 +607,12 @@ body #workspace .content .filters .select i {
     display: inline-block;
     font-size: 8px;
     z-index: 1;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid #f9f9f9;
 }
 
 body #workspace .content input {
     padding: 4px 8px 5px;
-    border: 1px solid #aaa;
+    border: 1px solid #ccc;
 }
 
 body #workspace .content .filters button.icon, body #workspace .content .filters a.icon {
@@ -590,6 +620,10 @@ body #workspace .content .filters button.icon, body #workspace .content .filters
     width: auto;
     min-width: auto;
     border: none;
+}
+
+body #workspace .content .filters select:focus, body #workspace .content .filters input:focus {
+    border: 1px solid #09c;
 }
 
 #search-all {

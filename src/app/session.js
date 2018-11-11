@@ -35,7 +35,6 @@ app.session.add = function(type, data)
     if (app.session.store.length > app.session.maxLength) {
         app.session.store.pop();
     }
-    console.log(app.session.store);
     app.session.index = 0;
 };
 

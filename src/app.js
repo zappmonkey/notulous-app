@@ -18,6 +18,7 @@ app.init = function() {
 };
 
 app.error = function(err) {
+    console.log(err.code, err.message);
     app.notification.add("Error in query", err.message, "error");
     return err.message;
 };
@@ -61,7 +62,7 @@ app.decrypt = function(text, secret) {
     return dec;
 };
 
-app.convertToQuery = function(field, filter, value1, value2) {
+app.convertToQuery = function(operator, field, filter, value1, value2) {
     var query = '`' + field + '` ';
     switch (filter.toLowerCase()) {
         case 'not contains':
@@ -82,6 +83,9 @@ app.convertToQuery = function(field, filter, value1, value2) {
             break;
         default:
             query += filter + ' "' + value1 + '"';
+    }
+    if (operator) {
+        query = ' ' + operator + ' ' + query;
     }
     return query;
 };

@@ -35,23 +35,25 @@ app.actions.tables = function() {
     });
 };
 
-app.actions.tableFilter = function() {
+app.actions.tableFilter = function()
+{
     $("#workspace .content .table:visible .container").css({top: $("#workspace .content .table:visible .filters").outerHeight()});
     $("#workspace .content .table:visible .filters").show();
-    $("#workspace .content .table:visible .filters [name='filter']").on('change', function(e) {
+    $("#workspace .content .table:visible .filters .filter").on('change', "[name='filter']", function(e) {
         var selected = $(this).find(":selected");
         if (selected.data('hidevalue')) {
-            $("#workspace .content .filters [name='value1']").hide();
-            $("#workspace .content .filters [name='value2']").hide();
+            $(this).parent().parent().find("input[name='value1']").hide();
+            $(this).parent().parent().find("input[name='value2']").hide();
         } else {
-            $("#workspace .content .filters [name='value1']").show();
-            $("#workspace .content .filters [name='value2']").hide();
+            $(this).parent().parent().find("input[name='value1']").show();
+            $(this).parent().parent().find("input[name='value2']").hide();
         }
         if (selected.data('showsecond')) {
-            $("#workspace .content .filters [name='value2']").show();
+            $(this).parent().parent().find("input[name='value2']").show();
         }
     });
-    $("#workspace .content .table:visible .filters a.clear").on('click', function(e) {
+
+    $("#workspace .content .table:visible .filters .filter").on('click', "a.clear", function(e) {
         var data = $(this).closest(".table").find("table").data();
         app.database.table.__data.filter = undefined;
         app.database.table.get(
@@ -61,16 +63,36 @@ app.actions.tableFilter = function() {
             data.order
         );
     });
+
+    $("#workspace .content .table:visible .filters .filter").on('click', "a.add", function(e) {
+        var query = $("#workspace .content .table:visible .filters .query-tpl").clone();
+        query.removeClass("query-tpl");
+        query.addClass("query");
+        query.insertAfter("#workspace .content .table:visible .filters .query:last");
+        $("#workspace .content .table:visible .container").css({top: $("#workspace .content .table:visible .filters").outerHeight()});
+    });
+
+    $("#workspace .content .table:visible .filters .filter").on('click', ".query .remove", function(e) {
+        $(this).parent().remove();
+        $("#workspace .content .table:visible .container").css({top: $("#workspace .content .table:visible .filters").outerHeight()});
+    });
+
     $("#workspace .content .table:visible .filters").on('submit', function(e) {
         e.stopPropagation();
         e.preventDefault();
         $("#workspace .content .table:visible .filters a.clear").show();
-        var filter = app.convertToQuery(
-            $("#workspace .content .table:visible .filters [name='field']").val(),
-            $("#workspace .content .table:visible .filters [name='filter']").val(),
-            $("#workspace .content .table:visible .filters [name='value1']").val(),
-            $("#workspace .content .table:visible .filters [name='value2']").val()
-        );
+        var filter = "";
+        $("#workspace .content .table:visible .filters .query:visible").each(function() {
+            var operator = $(this).find("[name='operator']");
+            filter += app.convertToQuery(
+                (operator ? operator.val() : undefined),
+                $(this).find("[name='field']").val(),
+                $(this).find("[name='filter']").val(),
+                $(this).find("[name='value1']").val(),
+                $(this).find("[name='value2']").val()
+            );
+            console.log(filter);
+        });
         var data = $("#workspace .content .table:visible table").data();
         app.database.table.get(
             data.table,
