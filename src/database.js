@@ -7,7 +7,8 @@ database.hasInstance = function(instance)
     return (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance]));
 };
 
-database.load = function(instance, callback, close_others) {
+database.load = function(instance, callback, close_others)
+{
     if (!instance) {
         throw "database load instance not defined";
     }
@@ -61,7 +62,8 @@ database.load = function(instance, callback, close_others) {
     }
 };
 
-database.close = function(instance) {
+database.close = function(instance)
+{
     if (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance])) {
         if (!notulous.util.empty(database.__instances[instance].mysql) && 'end' in database.__instances[instance].mysql) {
             database.__instances[instance].mysql.end(function(err) {});
@@ -73,7 +75,8 @@ database.close = function(instance) {
     }
 };
 
-database.closeAll = function() {
+database.closeAll = function()
+{
     for (var instance in database.__instances) {
         if (database.hasInstance(instance)) {
             database.close(instance);
@@ -81,7 +84,8 @@ database.closeAll = function() {
     }
 };
 
-database._ssh_config = function(instance) {
+database._ssh_config = function(instance)
+{
     var con = {};
     if (!notulous.util.empty(instance.ssh_host)) {
         con.host = instance.ssh_host;
@@ -101,7 +105,8 @@ database._ssh_config = function(instance) {
     return con;
 };
 
-database._mysql_config = function(instance) {
+database._mysql_config = function(instance)
+{
     var con = {};
     if (!notulous.util.empty(instance.host)) {
         con.host = instance.host;

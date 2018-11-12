@@ -1,13 +1,14 @@
-const {app, BrowserWindow, Menu, MenuItem} = require('electron')
+const {app, BrowserWindow, Menu, MenuItem} = require('electron');
 
-const path = require('path')
-const url = require('url')
+const path = require('path');
+const url = require('url');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let openWindows = 0;
 
-function createWindow () {
+function createWindow ()
+{
     // Create the browser window.
     let win = new BrowserWindow({
         width: 800,
@@ -16,12 +17,12 @@ function createWindow () {
         backgroundColor: '#252525',
         title: "Notulous",
         show: false
-    })
+    });
 
     win.once('ready-to-show', () => {
-        win.maximize()
-        win.show()
-    })
+        win.maximize();
+        win.show();
+    });
 
     // and load the index.html of the src.
     win.loadURL(url.format({
@@ -31,7 +32,7 @@ function createWindow () {
     }))
 
     // Open the DevTools.
-    win.webContents.openDevTools()
+    win.webContents.openDevTools();
 
     // Emitted when the window is closed.
     win.on('closed', () => {
@@ -39,14 +40,15 @@ function createWindow () {
         // in an array if your src supports multi windows, this is the time
         // when you should delete the corresponding element.
         win.destroy();
-        win = null
+        win = null;
         openWindows--;
-    })
+    });
     createMenu();
     openWindows++;
 };
 
-function createMenu() {
+function createMenu()
+{
     // const menu = new Menu()
     // menu.append(new MenuItem({
     //     label: 'Print',
@@ -117,6 +119,14 @@ function createMenu() {
                 accelerator: 'CmdOrCtrl+Alt+R',
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('remove-database');
+                }
+            },
+            {type: 'separator'},
+            {
+                label: 'Processlist',
+                accelerator: 'CmdOrCtrl+Alt+P',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('show-processlist');
                 }
             }
         ]

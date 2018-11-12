@@ -223,6 +223,50 @@ app.instance.databases = function(database)
     });
 };
 
+app.instance.__processlist_timer = undefined;
+app.instance.startProcesslist = function()
+{
+    app.instance.processlist();
+};
+
+app.instance.processlist = function()
+{
+    console.log("processlist");
+    app.instance.query({sql: "SHOW PROCESSLIST;", typeCast: false}, function (err, records, fields) {
+        if (err) {
+            return app.error(err);
+        }
+        var data = {};
+        data.table = "processlist";
+        data.fields = fields;
+        data.records = records;
+        var length = data.records.length;
+        data.start = 0;
+        data.end = data.start + length;
+        data.page = 1;
+        data.start += 1;
+        app.view.modal(
+            notulous.util.renderTpl("table", data),
+            true,
+            function() {
+                clearTimeout(app.instance.__processlist_timer);
+            }
+        );
+        // app.instance.__processlist_timer = setTimeout(function() {
+        //     app.instance.processlist();
+        // }, 5000);
+    });
+};
+
+app.instance.kill = function(id) {
+    app.instance.query("KILL " + id + ";");
+};
+
+app.instance.killConnection = function(id) {
+    app.instance.query("KILL CONNECTION " + id + ";");
+};
+
+
 app.instance.query = function(query, callback)
 {
     if (app.__mysql != undefined) {

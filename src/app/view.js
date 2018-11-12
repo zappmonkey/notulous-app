@@ -136,3 +136,31 @@ app.view.checkQueryNavigation = function()
         $("#workspace .top .previous").hide();
     }
 };
+
+app.view.__on_modal_close = undefined;
+
+app.view.modal = function(content, no_padding, on_close)
+{
+    app.view.__on_modal_close = on_close;
+    if ($("#modal").length > 0) {
+        $("#modal").removeClass("no-padding");
+        if (no_padding) {
+            $("#modal").addClass("no-padding");
+        }
+        $("#modal .content").html(content);
+        return;
+    }
+    $("body").append(
+        notulous.util.renderTpl("modal", {
+            content: content,
+            no_padding: no_padding,
+            maxheight: $(window).height()-250
+        })
+    );
+    $("#overlay .overlay-bg, #modal .close").on("click", function() {
+        $("#overlay").remove();
+        if (app.view.__on_modal_close) {
+            app.view.__on_modal_close();
+        }
+    });
+};

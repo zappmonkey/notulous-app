@@ -62,6 +62,7 @@
         <script type="text/javascript" src="../src/app/history.js"></script>
         <script type="text/javascript" src="../src/app/session.js"></script>
         <script type="text/javascript" src="../src/app/notifications.js"></script>
+        <script type="text/javascript" src="../src/app/contextmenu.js"></script>
         <script type="text/javascript" src="../src/app/database.js"></script>
         <script type="text/javascript" src="../src/app/database/table.js"></script>
         <script type="text/javascript" src="../src/app/database/terminal.js"></script>
@@ -318,6 +319,17 @@
         </div>
     </div>
 </div>
+</script>
+
+<script type="text/template" id="tpl-modal">
+    <div id="overlay">
+        <div class="overlay-bg"></div>
+        <div id="modal" class="{{#if no_padding}}no-padding{{/if}}">
+            <div class="content" style="max-height:{{maxheight}}px">
+                {{{content}}}
+            </div>
+        </div>
+    </div>
 </script>
 
 <script type="text/template" id="tpl-filter">

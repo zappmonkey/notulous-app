@@ -1,6 +1,5 @@
 const fontawesome = require('@fortawesome/fontawesome');
 const faSolid = require('@fortawesome/fontawesome-free-solid');
-// const { remote } = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
 
 window.destroy = function() {
@@ -53,30 +52,6 @@ ipcRenderer.on('add-instance', function() {
     app.instance.add();
 });
 
-const {remote} = require('electron')
-const {Menu, MenuItem} = remote
-
-var item;
-const template = [{
-    label: 'Edit',
-    click: () => {
-        app.instance.edit(item.data("key"));
-    }
-},{
-    label: 'Duplicate',
-    click: () => {
-        app.instance.duplicate(item.data("key"));
-    }
-},{
-    label: 'Remove',
-    click: () => {
-        app.instance.remove(item.data("key"));
-    }
-}];
-const menu = Menu.buildFromTemplate(template);
-
-$(document).on('contextmenu', "#menu li", function(e) {
-    item = $(this);
-    e.preventDefault()
-    menu.popup(remote.getCurrentWindow())
+ipcRenderer.on('show-processlist', function() {
+    app.instance.startProcesslist();
 });
