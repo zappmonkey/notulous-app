@@ -2,11 +2,16 @@ var database = {
     __instances: {}
 };
 
+database.hasInstance = function(instance)
+{
+    return (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance]));
+};
+
 database.load = function(instance, callback, close_others) {
     if (!instance) {
         throw "database load instance not defined";
     }
-    if (database._has_active_instance(instance)) {
+    if (database.hasInstance(instance)) {
         try {
             var mysql = database.__instances[instance.key].mysql;
             if (mysql.ping() == 'OK' && callback) {
@@ -27,16 +32,16 @@ database.load = function(instance, callback, close_others) {
         var mysql = require('mysql2');
         var client = mysql.createConnection(database._mysql_config(instance));
         client.on('error', function(err) {
-            console.log("I'm dead", err);
+            console.log("Connection closed unexpectedly - ", err.code, " - ", err.message);
             database.__instances[instance.key] = undefined;
         });
-        client.on('connection', function() {
-            console.log("Connection",  app.database.getSelected());
-            if (app.database.getSelected()) {
-                console.log(this);
-                this.query("USE `" + app.database.getSelected() + "`;");
-            }
-        });
+        // client.on('connection', function() {
+        //     console.log("Connection",  app.database.getSelected());
+        //     if (app.database.getSelected()) {
+        //         console.log(this);
+        //         this.query("USE `" + app.database.getSelected() + "`;");
+        //     }
+        // });
         database.__instances[instance.key] = {mysql: client, ssh: undefined};
         if (callback) {
             callback(client)
@@ -70,14 +75,10 @@ database.close = function(instance) {
 
 database.closeAll = function() {
     for (var instance in database.__instances) {
-        if (database._has_active_instance(instance)) {
+        if (database.hasInstance(instance)) {
             database.close(instance);
         }
     }
-};
-
-database._has_active_instance = function(instance) {
-    return (database.__instances.hasOwnProperty(instance) && !notulous.util.empty(database.__instances[instance]));
 };
 
 database._ssh_config = function(instance) {

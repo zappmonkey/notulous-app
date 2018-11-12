@@ -7,14 +7,30 @@ app.instance = {
     __lastCustomQuery: undefined
 };
 
-app.instance.getSelected = function() {
+app.instance.getSelected = function()
+{
     return app.instance.__selected;
 };
-app.instance.getSelectedData = function() {
+
+app.instance.getSelectedData = function()
+{
     return app.instance.__selected_data;
 };
 
-app.instance.remove = function(instance) {
+app.instance.getConfig = function(instance)
+{
+    var config = notulous.config.instance(instance);
+    if (config.hash && config.password) {
+        config.password = app.decrypt(config.password, config.hash+config.key);
+        if (config.type == "ssh+sql" && config.ssh_password) {
+            config.ssh_password = app.decrypt(config.ssh_password, config.hash+config.key);
+        }
+    }
+    return config;
+};
+
+app.instance.remove = function(instance)
+{
     var config = app.config();
     if (config.instances[instance]) {
         config.instances[instance] = undefined;
@@ -29,11 +45,13 @@ app.instance.remove = function(instance) {
     }
 };
 
-app.instance.edit = function(instance) {
+app.instance.edit = function(instance)
+{
     app.instance.add(notulous.config.instance(instance));
 };
 
-app.instance.duplicate = function(instance) {
+app.instance.duplicate = function(instance)
+{
     var instance = JSON.parse(JSON.stringify(notulous.config.instance(instance)));
     instance.name += " (duplicate)";
     if (instance.hash) {
@@ -47,7 +65,8 @@ app.instance.duplicate = function(instance) {
     app.instance.add(instance);
 };
 
-app.instance.add = function(instanceData) {
+app.instance.add = function(instanceData)
+{
     $("body").append(
         notulous.util.renderTpl("instance-add", {instance: instanceData})
     );
@@ -127,7 +146,8 @@ app.instance.add = function(instanceData) {
     });
 };
 
-app.instance.get = function() {
+app.instance.get = function()
+{
     $("#menu .content").html(
         notulous.util.renderTpl("instances", app.config())
     );
@@ -141,14 +161,9 @@ app.instance.get = function() {
     app.actions.instances();
 };
 
-app.instance.set = function(instance) {
-    var data = notulous.config.instance(instance);
-    if (data.hash && data.password) {
-        data.password = app.decrypt(data.password, data.hash+data.key);
-        if (data.type == "ssh+sql" && data.ssh_password) {
-            data.ssh_password = app.decrypt(data.ssh_password, data.hash+data.key);
-        }
-    }
+app.instance.set = function(instance)
+{
+    var config = app.instance.getConfig(instance);
     // clear all
     app.database.__selected = undefined;
     $('#menu .databases li.active').removeClass('active');
@@ -159,20 +174,21 @@ app.instance.set = function(instance) {
     $("#workspace .top .buttons.table").hide();
     $("#workspace .top .buttons.database").hide();
 
-    database.load(data, function(client) {
+    database.load(config, function(client) {
         app.__mysql = client;
         app.instance.__selected = instance;
         app.instance.__selected_data = {
-            name: data.name,
-            host: data.host,
-            key: data.key,
-            color: data.color
+            name: config.name,
+            host: config.host,
+            key: config.key,
+            color: config.color
         };
-        app.instance.databases(data.database);
+        app.instance.databases(config.database);
     }, true);
 };
 
-app.instance.databases = function(database) {
+app.instance.databases = function(database)
+{
     $('#menu .top .button.active').removeClass('active');
     $('#menu .top .button.databases-but').addClass('active').show();
 
@@ -210,8 +226,18 @@ app.instance.databases = function(database) {
 app.instance.query = function(query, callback)
 {
     if (app.__mysql != undefined) {
-        app.history.add(query);
-        app.__mysql.query(query, callback);
+        if (!database.hasInstance(app.instance.getSelected())) {
+            // Reset the instance and execute query
+            database.load(app.instance.getConfig(app.instance.getSelected()), function(client) {
+                app.__mysql = client;
+                app.history.add(query);
+                app.__mysql.query('USE `' + app.database.getSelected() + '`;');
+                app.__mysql.query(query, callback);
+            }, true);
+        } else {
+            app.history.add(query);
+            app.__mysql.query(query, callback);
+        }
     } else {
         app.notification.add("No active connection", "Unable to execute query because there is no active connection.", "error");
     }
