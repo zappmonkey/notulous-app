@@ -137,30 +137,41 @@ app.view.checkQueryNavigation = function()
     }
 };
 
-app.view.__on_modal_close = undefined;
+app.view.modal = app.view.modal || {
+    __on_modal_close: undefined
+};
 
-app.view.modal = function(content, no_padding, on_close)
+
+app.view.modal.open = function(content, on_close, on_show, classes)
 {
-    app.view.__on_modal_close = on_close;
+    app.view.modal.__on_modal_close = on_close;
     if ($("#modal").length > 0) {
-        $("#modal").removeClass("no-padding");
-        if (no_padding) {
-            $("#modal").addClass("no-padding");
+        if (!$("#modal").hasClass(classes)) {
+            $("#modal").addClass(classes)
         }
         $("#modal .content").html(content);
+        if (on_show) {
+            on_show();
+        }
         return;
     }
     $("body").append(
         notulous.util.renderTpl("modal", {
             content: content,
-            no_padding: no_padding,
-            maxheight: $(window).height()-250
+            maxheight: $(window).height()-250,
+            classes: classes
         })
     );
-    $("#overlay .overlay-bg, #modal .close").on("click", function() {
-        $("#overlay").remove();
-        if (app.view.__on_modal_close) {
-            app.view.__on_modal_close();
-        }
-    });
+    $("#overlay .overlay-bg, #modal .close").on("click", app.view.modal.close);
+    if (on_show) {
+        on_show();
+    }
+};
+
+app.view.modal.close = function() {
+    $("#overlay").remove();
+    if (app.view.modal.__on_modal_close) {
+        app.view.modal.__on_modal_close();
+    }
+    return false;
 };

@@ -53,5 +53,5 @@ ipcRenderer.on('add-instance', function() {
 });
 
 ipcRenderer.on('show-processlist', function() {
-    app.instance.startProcesslist();
+    app.instance.processlist.start();
 });

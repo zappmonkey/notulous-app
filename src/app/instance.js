@@ -223,38 +223,64 @@ app.instance.databases = function(database)
     });
 };
 
-app.instance.__processlist_timer = undefined;
-app.instance.startProcesslist = function()
-{
-    app.instance.processlist();
+app.instance.processlist = app.instance.processlist || {
+    __timer: undefined,
+    __sort: undefined,
+    __order: undefined,
+    __timeout: 10000
 };
 
-app.instance.processlist = function()
+app.instance.processlist.__timer = undefined;
+app.instance.processlist.start = function()
+{
+    app.instance.processlist.__show();
+};
+
+app.instance.processlist.__show = function(sort, order)
 {
     console.log("processlist");
-    app.instance.query({sql: "SHOW PROCESSLIST;", typeCast: false}, function (err, records, fields) {
+    if (sort != undefined && order != undefined) {
+        app.instance.processlist.__sort = sort;
+        app.instance.processlist.__order = order;
+    }
+    var query = "SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST"
+    if (app.instance.processlist.__sort != undefined && app.instance.processlist.__order != undefined) {
+        query += " ORDER BY " + app.instance.processlist.__sort + " " + app.instance.processlist.__order + ";";
+    }
+    app.instance.query({sql: query, typeCast: false}, function (err, records, fields) {
         if (err) {
             return app.error(err);
         }
-        var data = {};
-        data.table = "processlist";
-        data.fields = fields;
-        data.records = records;
-        var length = data.records.length;
-        data.start = 0;
-        data.end = data.start + length;
-        data.page = 1;
-        data.start += 1;
-        app.view.modal(
+        var length   = records.length;
+        var data = {
+            sort:    sort,
+            order:   order,
+            table:   "processlist",
+            fields:  fields,
+            records: records,
+            start:   1,
+            end:     length - 1,
+            page:    1
+        };
+        app.view.modal.open(
             notulous.util.renderTpl("table", data),
-            true,
             function() {
-                clearTimeout(app.instance.__processlist_timer);
-            }
+                clearTimeout(app.instance.processlist.__timer);
+            },
+            function() {
+                $("#modal table th").on("click", function() {
+                    var order = $(this).data("order");
+                    if (notulous.util.empty(order)) {
+                        order = 'desc';
+                    }
+                    app.instance.processlist.__show($(this).data("sort"), order);
+                });
+            },
+            "processlist no-padding"
         );
-        // app.instance.__processlist_timer = setTimeout(function() {
-        //     app.instance.processlist();
-        // }, 5000);
+        app.instance.processlist.__timer = setTimeout(function() {
+            app.instance.processlist.__show();
+        }, app.instance.processlist.__timeout);
     });
 };
 

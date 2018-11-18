@@ -355,9 +355,5 @@ app.actions.terminal = function() {
 };
 
 app.actions.copyToClipboard = function(el) {
-    var $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val(el.text()).select();
-    document.execCommand("copy");
-    $temp.remove();
+    notulous.util.copyToClipboard(el.text());
 };

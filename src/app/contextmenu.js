@@ -40,6 +40,18 @@ app.contextmenu.processlistTemplate = [{
     click: () => {
         app.instance.killConnection(app.contextmenu.processItem.find("td:first-child").text());
     }
+},{
+    label: 'Copy',
+    click: () => {
+        var row = "";
+        app.contextmenu.processItem.find("td").each(function() {
+            if (row != "") {
+                row += "\t";
+            }
+            row += $(this).text();
+        });
+        notulous.util.copyToClipboard(row);
+    }
 }];
 app.contextmenu.processlist = Menu.buildFromTemplate(app.contextmenu.processlistTemplate );
 

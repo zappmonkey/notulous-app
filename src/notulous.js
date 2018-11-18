@@ -72,6 +72,14 @@ notulous.util.renderTpl = function(tpl, data) {
     return Handlebars.compile($("#tpl-" + tpl).html())(data);
 };
 
+notulous.util.copyToClipboard = function(text) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val(text).select();
+    document.execCommand("copy");
+    $temp.remove();
+};
+
 notulous.storage = {};
 notulous.storage.set = function(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
