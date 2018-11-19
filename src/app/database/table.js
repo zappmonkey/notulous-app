@@ -33,6 +33,7 @@ app.database.table.get = function(table, page, sort, order, filter)
             filter: filter,
             sort: sort,
             order: order,
+            editable: true,
             limit: 1000,
             query: "SELECT * FROM" + " `" + table + "`"
         };
@@ -281,46 +282,92 @@ app.database.table.__get = function(data)
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
             });
 
-            $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
-                var index = $(this).data('index');
-                var el = $(this).closest("table");
-                var table = $(this).closest("table").data("table");
-                var data = {
-                    maxheight: $(window).height()-250,
-                    table: table,
-                    columns: app.database.table.columns(table),
-                    record: app.database.table.__records[table][index]
-                };
-                $("body").append(
-                    notulous.util.renderTpl("record", data)
-                );
-                $("#overlay .overlay-bg, #modal .close").on("click", function() {
-                    $("#overlay").remove();
-                });
-                $("#modal .save").on("click", function() {
-                    var key;
-                    var fields = [];
-                    $("#modal .fields input, #modal .fields textarea").each(function() {
-                        if ($(this).val() != $(this).data("value")) {
-                            fields.push('`' + $(this).data("field") + '` = "' + $(this).val() + '"');
-                        }
-                        if ($(this).hasClass("primary")) {
-                            key ='`' + $(this).data("field") + '` = "' + $(this).data("value") + '"';
-                        }
-                    });
-                    if (fields.length == 0) {
-                        return $("#overlay").remove();
+            $("#workspace .content .table." + data.hash + " tbody tr td span").on('focus', function() {
+                $(this).attr("contenteditable", "true");
+                if (!$(this).parent().hasClass("updated")) {
+                    $(this).parent().data("value", $(this).text());
+                }
+                $(this).selectRange(0, $(this).text().length);
+                if (!$(this).closest("tr").hasClass("focussed")) {
+                    var focussed = $(this).closest("table").find("tr.focussed");
+                    if (focussed.length == 1) {
+                        var changed = [];
+                        focussed.find("td.updated span").each(function() {
+                            var field = $(this).closest("table").find("th[data-index=" + $(this).parent().data("index") + "]").text().trim();
+                            changed[field] = $(this).text();
+                        });
+                        console.log("changed", changed);
                     }
-                    var query = 'UPDATE `' + $("#modal .fields").data("table") + '` SET ' + fields.join(", ") + ' WHERE ' + key + ';';
-                    app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
-                        if (err) {
-                            return app.error(err);
-                        }
-                        app.database.table.refresh();
-                        $("#overlay").remove();
-                    });
-                });
+                    focussed.removeClass("focussed");
+                }
+                $(this).closest("tr").addClass("focussed");
             });
+
+            $("#workspace .content .table." + data.hash + " tbody tr td span").on('blur', function() {
+                $(this).removeAttr("contenteditable");
+                if ($(this).parent().data("value") != $(this).text()) {
+                    $(this).parent().addClass("updated");
+                }
+            });
+
+            $("#workspace .content .table." + data.hash + " tbody tr").on('blur', function() {
+                var changed = [];
+                $(this).find("td.updated span").each(function() {
+                    changed[$(this).parent().data("index")] = $(this).text();
+                });
+                console.log(changed);
+            });
+
+            // $("#workspace .content .table." + data.hash + " tbody tr td").on('focus', function() {
+            //     var value = $(this).find("span");
+            //     value.attr("contenteditable", "true");
+            //     if (!$(this).data("value")) {
+            //         $(this).data("value", value.text());
+            //     }
+            //     console.log(value.text());
+            //     value.focus();
+            // });
+
+            // $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
+            //     var index = $(this).data('index');
+            //     var el = $(this).closest("table");
+            //     var table = $(this).closest("table").data("table");
+            //     var data = {
+            //         maxheight: $(window).height()-250,
+            //         table: table,
+            //         columns: app.database.table.columns(table),
+            //         record: app.database.table.__records[table][index]
+            //     };
+            //     $("body").append(
+            //         notulous.util.renderTpl("record", data)
+            //     );
+            //     $("#overlay .overlay-bg, #modal .close").on("click", function() {
+            //         $("#overlay").remove();
+            //     });
+            //     $("#modal .save").on("click", function() {
+            //         var key;
+            //         var fields = [];
+            //         $("#modal .fields input, #modal .fields textarea").each(function() {
+            //             if ($(this).val() != $(this).data("value")) {
+            //                 fields.push('`' + $(this).data("field") + '` = "' + $(this).val() + '"');
+            //             }
+            //             if ($(this).hasClass("primary")) {
+            //                 key ='`' + $(this).data("field") + '` = "' + $(this).data("value") + '"';
+            //             }
+            //         });
+            //         if (fields.length == 0) {
+            //             return $("#overlay").remove();
+            //         }
+            //         var query = 'UPDATE `' + $("#modal .fields").data("table") + '` SET ' + fields.join(", ") + ' WHERE ' + key + ';';
+            //         app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
+            //             if (err) {
+            //                 return app.error(err);
+            //             }
+            //             app.database.table.refresh();
+            //             $("#overlay").remove();
+            //         });
+            //     });
+            // });
             $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
                 var table = $(this).closest(".table").find("table");
                 app.database.table.get(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));

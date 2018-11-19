@@ -366,7 +366,20 @@ table tr th {
 table tr td .has-foreign {
     float: right;
     color: #aaa;
-    cursor: pointer;
+}
+
+table tr td span {
+    padding-right: 5px;
+    user-select: all;
+}
+
+table tr td span:focus {
+    text-decoration: underline;
+}
+
+table tr td span[contenteditable]:empty
+{
+    padding: 5px 1px;
 }
 
 table tr td .has-foreign svg {
@@ -379,7 +392,7 @@ table tr td em {
     font-style: normal;
 }
 
-table.clickable tbody tr:not(.header):hover {
+table.editable tbody tr:not(.header):hover {
     background: rgba(0, 0, 0, 0.12);
 }
 

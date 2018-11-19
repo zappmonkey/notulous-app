@@ -197,23 +197,25 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
     return null;
 });
 
-Handlebars.registerHelper('recordValue', function(relations, fields, index, value) {
+Handlebars.registerHelper('recordValue', function(relations, fields, index, rowIndex, value)
+{
+    rowIndex++;
+    var tabindex = String(rowIndex) + String(index);
     if (value === null) {
-        return new Handlebars.SafeString("<em>NULL</em>");
+        return "<em tabindex='" + tabindex + "'>NULL</em>";
     }
     if (!relations || relations.length == 0) {
-        return value;
+        return '<span tabindex="' + tabindex + '">' + value + '</span>';
     }
     if (!fields[index]) {
-        return value;
+        return '<span tabindex="' + tabindex + '">' + value + '</span>';
     }
     var field = fields[index].name;
     if (!relations[field]) {
-        return value;
+        return '<span tabindex="' + tabindex + '">' + value + '</span>';
     }
-    return new Handlebars.SafeString(value + '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>');
+    return '<span tabindex="' + tabindex + '">' + value + '</span>' + '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>';
 });
-
 
 Handlebars.registerHelper('isInput', function(type, options) {
     // console.log(type);
@@ -249,3 +251,16 @@ Handlebars.registerHelper('dateFormat', function(date, format) {
         return date;
     };
 });
+
+$.fn.selectRange = function(start, end) {
+    return this.each(function() {
+        var el = this;
+        var range = document.createRange();
+        var sel = window.getSelection();
+        range.setStart(el.childNodes[0], start);
+        range.setEnd(el.childNodes[0], end);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        el.focus();
+    });
+};

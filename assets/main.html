@@ -113,7 +113,7 @@
     <div class="filters">
     </div>
     <div class="container">
-        <table class="table clickable{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-query="{{query}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
+        <table class="table{{#if editable}} editable{{/if}}{{#if transposed}} transpose{{/if}}" data-filter="{{filter}}" data-table="{{table}}" data-query="{{query}}" data-sort="{{sort}}" data-order="{{order}}" data-page="{{page}}" data-filter="{{filter}}" data-hash="{{hash}}">
             <tr class="header">
                 {{#each fields}}
                 <th data-index="{{@index}}" data-sort="{{name}}"{{#ifEq name @root.sort}} class="{{@root.order}}" {{#ifEq @root.order 'desc'}}data-order="asc"{{/ifEq}}{{/ifEq}}>
@@ -125,7 +125,7 @@
             </tr>
             <tr class="first"></tr>
             {{#each records}}
-            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{recordValue @root.relations @root.fields @index this}}</td>{{/each}}</tr>
+            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{{recordValue @root.relations @root.fields @index @../index this}}}</td>{{/each}}</tr>
             {{/each}}
         </table>
     </div>
