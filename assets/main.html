@@ -125,7 +125,7 @@
             </tr>
             <tr class="first"></tr>
             {{#each records}}
-            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{{recordValue @root.relations @root.fields @index @../index this}}}</td>{{/each}}</tr>
+            <tr data-index="{{@index}}">{{#each this}}<td data-index="{{@index}}">{{{recordValue @root.relations @root.columns @index @../index this}}}</td>{{/each}}</tr>
             {{/each}}
         </table>
     </div>

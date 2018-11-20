@@ -373,6 +373,15 @@ table tr td span {
     user-select: all;
 }
 
+table tr td span:empty:before {
+    content: "NULL";
+    color: #aaa;
+}
+
+table tr td span:empty + i.has-foreign {
+    display: none;
+}
+
 table tr td span:focus {
     text-decoration: underline;
 }

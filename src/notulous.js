@@ -200,21 +200,20 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
 Handlebars.registerHelper('recordValue', function(relations, fields, index, rowIndex, value)
 {
     rowIndex++;
+    var classes = "";
+    var related = "";
+    if (fields && fields[index].nullable) {
+        classes = 'nullable';
+    }
+    var field = fields[index].column;
+    if (relations && relations[field]) {
+        related = '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>'
+    }
     var tabindex = String(rowIndex) + String(index);
     if (value === null) {
-        return "<em tabindex='" + tabindex + "'>NULL</em>";
+        value = "";
     }
-    if (!relations || relations.length == 0) {
-        return '<span tabindex="' + tabindex + '">' + value + '</span>';
-    }
-    if (!fields[index]) {
-        return '<span tabindex="' + tabindex + '">' + value + '</span>';
-    }
-    var field = fields[index].name;
-    if (!relations[field]) {
-        return '<span tabindex="' + tabindex + '">' + value + '</span>';
-    }
-    return '<span tabindex="' + tabindex + '">' + value + '</span>' + '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>';
+    return '<span class="' + classes + '" tabindex="' + tabindex + '">' + value + '</span>' + related;
 });
 
 Handlebars.registerHelper('isInput', function(type, options) {

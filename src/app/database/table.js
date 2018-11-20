@@ -89,8 +89,6 @@ app.database.table.info = function()
     });
 };
 
-
-
 app.database.table.structure = function(table, callback)
 {
     if (!table) {
@@ -109,6 +107,7 @@ app.database.table.structure = function(table, callback)
     }
 
     structure = {
+        primary: undefined,
         fields: undefined,
         indexes: undefined,
         relations: undefined
@@ -121,9 +120,14 @@ app.database.table.structure = function(table, callback)
         var fields = [];
         var field;
         var type;
+        var primary = {
+            index: undefined,
+            column: undefined
+        };
         for (var key in results) {
             type = results[key].COLUMN_TYPE;
             field = {};
+            field.index = key;
             field.column = results[key].COLUMN_NAME;
             field.type = results[key].DATA_TYPE.toUpperCase();
             field.unsigned = (type.indexOf("unsigned") > 0);
@@ -134,8 +138,13 @@ app.database.table.structure = function(table, callback)
             field.extra = results[key].EXTRA;
             field.encoding = results[key].CHARACTER_SET_NAME;
             field.collation = results[key].COLLATION_NAME;
-            fields.push(field);
+            fields[key] = field;
+            if (results[key].COLUMN_KEY.toLowerCase() == 'pri') {
+                primary.index = key;
+                primary.column = field.column;
+            }
         }
+        structure.primary = primary;
         structure.fields = fields;
         if (structure.fields && structure.indexes && structure.relations) {
             app.database.table.__structure[table] = structure;
@@ -246,6 +255,7 @@ app.database.table.__get = function(data)
             }
             data.transposed = app.database.table.transposed();
             data.relations = app.database.table.__structure[data.table].relations;
+            data.columns = app.database.table.__structure[data.table].fields;
             app.view.checkQueryNavigation();
             html = notulous.util.renderTpl("table", data);
             data.records = undefined;
@@ -282,51 +292,62 @@ app.database.table.__get = function(data)
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
             });
 
-            $("#workspace .content .table." + data.hash + " tbody tr td span").on('focus', function() {
+            var blurredTimeout, blurredRow;
+            $("#workspace .content .table." + data.hash + " tbody tr td span").on('focus', function(e)
+            {
+                if (blurredRow === e.delegateTarget.parentElement.parentElement) {
+                    clearTimeout(blurredTimeout);
+                }
                 $(this).attr("contenteditable", "true");
                 if (!$(this).parent().hasClass("updated")) {
                     $(this).parent().data("value", $(this).text());
                 }
                 $(this).selectRange(0, $(this).text().length);
-                if (!$(this).closest("tr").hasClass("focussed")) {
-                    var focussed = $(this).closest("table").find("tr.focussed");
-                    if (focussed.length == 1) {
-                        var changed = [];
-                        focussed.find("td.updated span").each(function() {
-                            var field = $(this).closest("table").find("th[data-index=" + $(this).parent().data("index") + "]").text().trim();
-                            changed[field] = $(this).text();
-                        });
-                        console.log("changed", changed);
-                    }
-                    focussed.removeClass("focussed");
-                }
-                $(this).closest("tr").addClass("focussed");
-            });
-
-            $("#workspace .content .table." + data.hash + " tbody tr td span").on('blur', function() {
+            }).on('blur', function(e)
+            {
                 $(this).removeAttr("contenteditable");
                 if ($(this).parent().data("value") != $(this).text()) {
                     $(this).parent().addClass("updated");
                 }
+                var row = $(this).parent().parent();
+                blurredRow = e.delegateTarget.parentElement.parentElement;
+                blurredTimeout = setTimeout(function() {
+                    var table = row.closest("table");
+                    app.database.table.structure(
+                        table.data("table"),
+                        function(structure) {
+                            var fields = [];
+                            var field, value, index;
+                            row.find("td.updated span").each(function() {
+                                $(this).parent().removeClass('updated');
+                                index = $(this).parent().data("index");
+                                field = $(this).closest("table").find("th[data-index=" + index + "]").text().trim();
+                                value = $(this).text();
+                                if (notulous.util.empty(value) && structure.fields[index].nullable) {
+                                    value = 'NULL';
+                                } else {
+                                    value = "'" + value + "'";
+                                }
+                                fields.push("`" + field + "` = " + value);
+                            });
+                            if (fields.length > 0) {
+                                var primary = row.find("td[data-index='" + structure.primary.index + "'] span");
+                                var id = primary.text();
+                                if (!notulous.util.empty(primary.data('value'))) {
+                                    id = primary.data('value');
+                                    primary.data('value', undefined);
+                                }
+                                var query = "UPDATE `" + table.data("table") + "` SET " + fields.join(", ") + " WHERE `" + structure.primary.column + "` = " + id;
+                                app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
+                                    if (err) {
+                                        return app.error(err);
+                                    }
+                                });
+                            }
+                        }
+                    )
+                }, 0);
             });
-
-            $("#workspace .content .table." + data.hash + " tbody tr").on('blur', function() {
-                var changed = [];
-                $(this).find("td.updated span").each(function() {
-                    changed[$(this).parent().data("index")] = $(this).text();
-                });
-                console.log(changed);
-            });
-
-            // $("#workspace .content .table." + data.hash + " tbody tr td").on('focus', function() {
-            //     var value = $(this).find("span");
-            //     value.attr("contenteditable", "true");
-            //     if (!$(this).data("value")) {
-            //         $(this).data("value", value.text());
-            //     }
-            //     console.log(value.text());
-            //     value.focus();
-            // });
 
             // $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
             //     var index = $(this).data('index');
