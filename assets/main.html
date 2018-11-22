@@ -299,16 +299,13 @@
 <div id="overlay">
     <div class="overlay-bg"></div>
     <div id="modal" class="record">
+        <div class="title">{{table}}</div>
         <div class="content" style="max-height:{{maxheight}}px">
-            <div class="fields" data-table="{{table}}">
+            <div class="fields" data-table="{{table}}" data-index="{{index}}">
                 {{#each columns}}
                 <label>
-                    <span>{{Field}}{{#ifEq Key 'PRI'}} (Primary){{/ifEq}}</span>
-                    {{#isInput Type }}
-                    <input type="text"{{#ifEq Key 'PRI'}} class="primary"{{/ifEq}} data-field="{{Field}}" data-value="{{property ../record Field false false}}" value="{{property ../record Field false false}}"/>
-                    {{else}}
-                    <textarea data-field="{{Field}}" data-value="{{property ../record Field false false}}">{{property ../record Field false false}}</textarea>
-                    {{/isInput}}
+                    <span>{{column}}{{#ifEq key 'PRI'}} (Primary){{/ifEq}}</span>
+                    {{{formElement this ../record}}}
                 </label>
                 {{/each}}
             </div>

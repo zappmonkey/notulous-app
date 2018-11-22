@@ -344,7 +344,6 @@ table tr td, table tr th {
     max-width: 200px;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
     padding: 5px 10px 7px;
     border-bottom: 1px solid #ededed;
     color: #1a1a1a;
@@ -361,6 +360,7 @@ table tr th {
     cursor: default;
     user-select: none;
     border-bottom: none;
+    text-overflow: ellipsis;
 }
 
 table tr td .has-foreign {
@@ -371,11 +371,16 @@ table tr td .has-foreign {
 table tr td span {
     padding-right: 5px;
     user-select: all;
+    display: inline-block;
 }
 
 table tr td span:empty:before {
-    content: "NULL";
+    content: "...";
     color: #aaa;
+}
+
+table tr td span.nullable:empty:before {
+    content: "NULL";
 }
 
 table tr td span:empty + i.has-foreign {
@@ -383,12 +388,12 @@ table tr td span:empty + i.has-foreign {
 }
 
 table tr td span:focus {
-    text-decoration: underline;
+    /*text-decoration: underline;*/
 }
 
 table tr td span[contenteditable]:empty
 {
-    padding: 5px 1px;
+    /*padding: 5px 1px;*/
 }
 
 table tr td .has-foreign svg {

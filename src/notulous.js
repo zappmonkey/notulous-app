@@ -205,15 +205,72 @@ Handlebars.registerHelper('recordValue', function(relations, fields, index, rowI
     if (fields && fields[index].nullable) {
         classes = 'nullable';
     }
-    var field = fields[index].column;
-    if (relations && relations[field]) {
-        related = '<i class="has-foreign" data-table="' + relations[field].table + '" data-column="' + relations[field].column + '"><i class="fas fa-link"></i></i>'
+    var column = fields[index].column;
+    if (relations && relations[column]) {
+        related = '<i class="has-foreign" data-table="' + relations[column].table + '" data-column="' + relations[column].column + '"><i class="fas fa-link"></i></i>'
     }
     var tabindex = String(rowIndex) + String(index);
     if (value === null) {
         value = "";
     }
-    return '<span class="' + classes + '" tabindex="' + tabindex + '">' + value + '</span>' + related;
+    var options;
+    if (fields[index].options) {
+        options = fields[index].options.join(",");
+    }
+    return '<span date-type="' + fields[index].type + '" date-options="' + options + '" class="' + classes + '" tabindex="' + tabindex + '">' + Handlebars.Utils.escapeExpression(value) + '</span>' + related;
+});
+
+Handlebars.registerHelper('formElement', function(column, record)
+{
+    var classes;
+    if (column.nullable) {
+        classes = 'nullable';
+    }
+    var value = record[column.column];
+    if (value === null) {
+        value = "";
+    }
+
+    // This should be input
+    if (
+        column.type == 'DATE' ||
+        column.type == 'DATETIME' ||
+        column.type == 'TIME' ||
+        column.type == 'YEAR' ||
+        column.type.substr(0,3) == 'DEC' ||
+        column.type.substr(0,3) == 'INT' ||
+        column.type.substr(0,9) == 'MEDIUMINT' ||
+        column.type.substr(0,4) == 'TINY' ||
+        column.type.substr(0,5) == 'SMALL' ||
+        column.type.substr(0,5) == 'BIG'||
+        (
+            column.type.substr(0,7) == 'VARCHAR' && column.type.substring(8, column.type.length-1) < 257
+        ) ||
+        (
+            column.type == 'ENUM' && column.options.length == 0
+        )
+    ) {
+        if (column.key == 'PRI') {
+            classes = 'primary ' + classes;
+        }
+        return '<input type="text" class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '" value="' + value + '"/>';
+    }
+
+    if (column.type == 'ENUM') {
+        var el =  '<select class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '">';
+        if (column.nullable) {
+            selected = value == "" ? ' selected="selected"' : "";
+            el +=  '<option value=""' + selected + '>NULL</option>';
+        }
+        for (var prop in column.options) {
+            var val = column.options[prop];
+            selected = value == val ? ' selected="selected"' : "";
+            el +=  '<option value="' + val + '"' + selected + '>' + val + '</option>';
+        }
+        el += '</select>';
+        return el;
+    }
+    return '<textarea class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '">' + Handlebars.Utils.escapeExpression(value) + '</textarea>';
 });
 
 Handlebars.registerHelper('isInput', function(type, options) {
@@ -254,10 +311,16 @@ Handlebars.registerHelper('dateFormat', function(date, format) {
 $.fn.selectRange = function(start, end) {
     return this.each(function() {
         var el = this;
+        if (el.childNodes.length == 0) {
+            el.focus();
+            return;
+        }
         var range = document.createRange();
         var sel = window.getSelection();
         range.setStart(el.childNodes[0], start);
-        range.setEnd(el.childNodes[0], end);
+        if (end) {
+            range.setEnd(el.childNodes[0], end);
+        }
         sel.removeAllRanges();
         sel.addRange(range);
         el.focus();

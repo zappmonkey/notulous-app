@@ -138,7 +138,11 @@ app.database.table.structure = function(table, callback)
             field.extra = results[key].EXTRA;
             field.encoding = results[key].CHARACTER_SET_NAME;
             field.collation = results[key].COLLATION_NAME;
+            field.options = undefined;
             fields[key] = field;
+            if (field.type == 'ENUM') {
+                field.options = field.length.replace(/["']/g, "").split(',');
+            }
             if (results[key].COLUMN_KEY.toLowerCase() == 'pri') {
                 primary.index = key;
                 primary.column = field.column;
@@ -292,6 +296,10 @@ app.database.table.__get = function(data)
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
             });
 
+            $("#workspace .content .table." + data.hash + " .editable tbody tr td").on("mouseup", function(e) {
+                $(this).find("span").focus();
+            });
+
             var blurredTimeout, blurredRow;
             $("#workspace .content .table." + data.hash + " tbody tr td span").on('focus', function(e)
             {
@@ -302,7 +310,11 @@ app.database.table.__get = function(data)
                 if (!$(this).parent().hasClass("updated")) {
                     $(this).parent().data("value", $(this).text());
                 }
-                $(this).selectRange(0, $(this).text().length);
+                var end;
+                if ($(this).text().length > 0) {
+                    end = $(this).text().length;
+                }
+                $(this).selectRange(0, end);
             }).on('blur', function(e)
             {
                 $(this).removeAttr("contenteditable");
@@ -323,6 +335,7 @@ app.database.table.__get = function(data)
                                 index = $(this).parent().data("index");
                                 field = $(this).closest("table").find("th[data-index=" + index + "]").text().trim();
                                 value = $(this).text();
+                                app.database.table.__records[table.data("table")][row.data('index')][field] = new Buffer(value);
                                 if (notulous.util.empty(value) && structure.fields[index].nullable) {
                                     value = 'NULL';
                                 } else {
@@ -349,46 +362,54 @@ app.database.table.__get = function(data)
                 }, 0);
             });
 
-            // $("#workspace .content .table." + data.hash + " tbody tr").not(".header").on("click", function() {
-            //     var index = $(this).data('index');
-            //     var el = $(this).closest("table");
-            //     var table = $(this).closest("table").data("table");
-            //     var data = {
-            //         maxheight: $(window).height()-250,
-            //         table: table,
-            //         columns: app.database.table.columns(table),
-            //         record: app.database.table.__records[table][index]
-            //     };
-            //     $("body").append(
-            //         notulous.util.renderTpl("record", data)
-            //     );
-            //     $("#overlay .overlay-bg, #modal .close").on("click", function() {
-            //         $("#overlay").remove();
-            //     });
-            //     $("#modal .save").on("click", function() {
-            //         var key;
-            //         var fields = [];
-            //         $("#modal .fields input, #modal .fields textarea").each(function() {
-            //             if ($(this).val() != $(this).data("value")) {
-            //                 fields.push('`' + $(this).data("field") + '` = "' + $(this).val() + '"');
-            //             }
-            //             if ($(this).hasClass("primary")) {
-            //                 key ='`' + $(this).data("field") + '` = "' + $(this).data("value") + '"';
-            //             }
-            //         });
-            //         if (fields.length == 0) {
-            //             return $("#overlay").remove();
-            //         }
-            //         var query = 'UPDATE `' + $("#modal .fields").data("table") + '` SET ' + fields.join(", ") + ' WHERE ' + key + ';';
-            //         app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
-            //             if (err) {
-            //                 return app.error(err);
-            //             }
-            //             app.database.table.refresh();
-            //             $("#overlay").remove();
-            //         });
-            //     });
-            // });
+            $("#workspace .content .table." + data.hash + " tbody tr").not(".header").dblclick(function()
+            {
+                var index = $(this).data('index');
+                var table = $(this).closest("table").data("table");
+                var data = {
+                    maxheight: $(window).height()-250,
+                    index: index,
+                    table: table,
+                    columns: app.database.table.__structure[table].fields,
+                    record: app.database.table.__records[table][index]
+                };
+                $("body").append(
+                    notulous.util.renderTpl("record", data)
+                );
+                $("#overlay .overlay-bg, #modal .close").on("click", function() {
+                    $("#overlay").remove();
+                });
+                $("#modal .save").on("click", function() {
+                    var key;
+                    var fields = [];
+                    var table = $("#modal .fields").data("table");
+                    var index = $("#modal .fields").data("index");
+                    $("#modal .fields input, #modal .fields textarea, #modal .fields select").each(function() {
+                        if ($(this).val() != $(this).data("value")) {
+                            var value = '"' + $(this).val() + '"';
+                            if ($(this).hasClass("nullable") && notulous.util.empty($(this).val())) {
+                                value = 'NULL';
+                            }
+                            fields.push('`' + $(this).data("field") + '` = ' + value);
+                            app.database.table.__records[table][index][$(this).data("field")] = new Buffer($(this).val());
+                        }
+                        if ($(this).hasClass("primary")) {
+                            key ='`' + $(this).data("field") + '` = "' + $(this).data("value") + '"';
+                        }
+                    });
+                    if (fields.length == 0) {
+                        return $("#overlay").remove();
+                    }
+                    var query = 'UPDATE `' + table + '` SET ' + fields.join(", ") + ' WHERE ' + key + ';';
+                    app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
+                        if (err) {
+                            return app.error(err);
+                        }
+                        app.database.table.refresh();
+                        $("#overlay").remove();
+                    });
+                });
+            });
             $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
                 var table = $(this).closest(".table").find("table");
                 app.database.table.get(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
