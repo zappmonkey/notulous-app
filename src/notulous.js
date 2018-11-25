@@ -222,9 +222,10 @@ Handlebars.registerHelper('recordValue', function(relations, fields, index, rowI
 
 Handlebars.registerHelper('formElement', function(column, record)
 {
-    var classes;
+    var classes, placeholder;
     if (column.nullable) {
         classes = 'nullable';
+        placeholder = 'NULL';
     }
     var value = record[column.column];
     if (value === null) {
@@ -239,12 +240,13 @@ Handlebars.registerHelper('formElement', function(column, record)
         column.type == 'YEAR' ||
         column.type.substr(0,3) == 'DEC' ||
         column.type.substr(0,3) == 'INT' ||
+        column.type.substr(0,6) == 'DOUBLE'||
         column.type.substr(0,9) == 'MEDIUMINT' ||
         column.type.substr(0,4) == 'TINY' ||
         column.type.substr(0,5) == 'SMALL' ||
         column.type.substr(0,5) == 'BIG'||
         (
-            column.type.substr(0,7) == 'VARCHAR' && column.type.substring(8, column.type.length-1) < 257
+            column.type.substr(0,7) == 'VARCHAR' && column.length < 128
         ) ||
         (
             column.type == 'ENUM' && column.options.length == 0
@@ -253,7 +255,7 @@ Handlebars.registerHelper('formElement', function(column, record)
         if (column.key == 'PRI') {
             classes = 'primary ' + classes;
         }
-        return '<input type="text" class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '" value="' + value + '"/>';
+        return '<input type="text" class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '" value="' + value + '" placeholder="' + placeholder + '"/>';
     }
 
     if (column.type == 'ENUM') {
@@ -270,7 +272,7 @@ Handlebars.registerHelper('formElement', function(column, record)
         el += '</select>';
         return el;
     }
-    return '<textarea class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '">' + Handlebars.Utils.escapeExpression(value) + '</textarea>';
+    return '<textarea class="' + classes + '" data-field="' + column.column + '" data-value="' + value + '" placeholder="' + placeholder + '">' + Handlebars.Utils.escapeExpression(value) + '</textarea>';
 });
 
 Handlebars.registerHelper('isInput', function(type, options) {

@@ -827,6 +827,10 @@ body #workspace .content .filters select:focus, body #workspace .content .filter
     max-width: 100%;
 }
 
+#overlay #modal .content input::placeholder, #overlay #modal .content textarea::placeholder {
+    color: #aaa;
+}
+
 #overlay #modal .content input[name='color'] {
     background: rgba(255,255,255,0.5);
     -webkit-appearance: none;

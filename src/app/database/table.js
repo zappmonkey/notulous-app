@@ -370,6 +370,7 @@ app.database.table.__get = function(data)
                     maxheight: $(window).height()-250,
                     index: index,
                     table: table,
+                    primary: app.database.table.__structure[table].primary,
                     columns: app.database.table.__structure[table].fields,
                     record: app.database.table.__records[table][index]
                 };
@@ -410,6 +411,31 @@ app.database.table.__get = function(data)
                     });
                 });
             });
+
+            $("#workspace .content .table." + data.hash + " tbody tr td span").on('keydown', function(e)
+            {
+                var row, field;
+                switch (e.keyCode) {
+                    case 40:
+                        field = $(this).parent().data('index');
+                        row = $(this).parent().parent().data('index') + 1;
+                        break;
+                    case 38:
+                        field = $(this).parent().data('index');
+                        row = $(this).parent().parent().data('index') - 1;
+                        break;
+                }
+                if (row && field) {
+                    var nextRow = $("tr[data-index='" + row + "']");
+                    if (nextRow.length  == 0) {
+                        return;
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    nextRow.find("td[data-index='" + field + "']").trigger('mouseup');
+                }
+            });
+
             $("#workspace .content .table." + data.hash + " .status .next, #workspace .content .table." + data.hash + " .status .previous").on("click", function() {
                 var table = $(this).closest(".table").find("table");
                 app.database.table.get(table.data("table"), $(this).data("page"), table.data("sort"), table.data("order"), table.data("filter"));
