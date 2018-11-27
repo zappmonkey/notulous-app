@@ -310,21 +310,13 @@ Handlebars.registerHelper('dateFormat', function(date, format) {
     };
 });
 
-$.fn.selectRange = function(start, end) {
+$.fn.selectRange = function() {
     return this.each(function() {
-        var el = this;
-        if (el.childNodes.length == 0) {
-            el.focus();
-            return;
-        }
-        var range = document.createRange();
         var sel = window.getSelection();
-        range.setStart(el.childNodes[0], start);
-        if (end) {
-            range.setEnd(el.childNodes[0], end);
-        }
         sel.removeAllRanges();
+        var range = document.createRange();
+        range.selectNodeContents(this);
         sel.addRange(range);
-        el.focus();
+        this.focus();
     });
 };

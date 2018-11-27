@@ -297,7 +297,9 @@ app.database.table.__get = function(data)
             });
 
             $("#workspace .content .table." + data.hash + " .editable tbody tr td").on("mouseup", function(e) {
-                $(this).find("span").focus();
+                $(this).find("span").trigger('focus');
+                e.stopPropagation();
+                e.preventDefault();
             });
 
             var blurredTimeout, blurredRow;
@@ -310,11 +312,7 @@ app.database.table.__get = function(data)
                 if (!$(this).parent().hasClass("updated")) {
                     $(this).parent().data("value", $(this).text());
                 }
-                var end;
-                if ($(this).text().length > 0) {
-                    end = $(this).text().length;
-                }
-                $(this).selectRange(0, end);
+                $(this).selectRange();
             }).on('blur', function(e)
             {
                 $(this).removeAttr("contenteditable");
@@ -355,6 +353,16 @@ app.database.table.__get = function(data)
                                     if (err) {
                                         return app.error(err);
                                     }
+                                    query = "SELECT * FROM `" + table.data("table") + "`  WHERE `" + structure.primary.column + "` = " + id;
+                                    app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
+                                        if (err) {
+                                            return app.error(err);
+                                        }
+                                        app.database.table.__records[table.data("table")][row.data('index')] = records[0];
+                                        for (var index in fields) {
+                                            row.find("td[data-index='" + index + "'] span").text(records[0][fields[index].name]);
+                                        }
+                                    });
                                 });
                             }
                         }
@@ -364,6 +372,7 @@ app.database.table.__get = function(data)
 
             $("#workspace .content .table." + data.hash + " tbody tr").not(".header").dblclick(function()
             {
+                var row = $(this);
                 var index = $(this).data('index');
                 var table = $(this).closest("table").data("table");
                 var data = {
@@ -406,7 +415,16 @@ app.database.table.__get = function(data)
                         if (err) {
                             return app.error(err);
                         }
-                        app.database.table.refresh();
+                        query = "SELECT * FROM `" + table + "`  WHERE " + key + ';';
+                        app.instance.query({sql:query, typeCast:false}, function (err, records, fields) {
+                            if (err) {
+                                return app.error(err);
+                            }
+                            app.database.table.__records[table][index] = records[0];
+                            for (var index in fields) {
+                                row.find("td[data-index='" + index + "'] span").text(records[0][fields[index].name]);
+                            }
+                        });
                         $("#overlay").remove();
                     });
                 });
@@ -430,9 +448,9 @@ app.database.table.__get = function(data)
                     if (nextRow.length  == 0) {
                         return;
                     }
+                    nextRow.find("td[data-index='" + field + "']").trigger('mouseup');
                     e.preventDefault();
                     e.stopPropagation();
-                    nextRow.find("td[data-index='" + field + "']").trigger('mouseup');
                 }
             });
 
