@@ -202,22 +202,27 @@ Handlebars.registerHelper('recordValue', function(relations, fields, index, rowI
     rowIndex++;
     var classes = "";
     var related = "";
-    if (fields && fields[index].nullable) {
-        classes = 'nullable';
+    var column, options;
+    var type;
+    if (fields) {
+        if (fields[index].options) {
+            options = fields[index].options.join(",");
+        }
+        if (fields[index].nullable) {
+            classes = 'nullable';
+        }
+        column = fields[index].column;
+        type = fields[index].type;
     }
-    var column = fields[index].column;
-    if (relations && relations[column]) {
+
+    if (relations && column && relations[column]) {
         related = '<i class="has-foreign" data-table="' + relations[column].table + '" data-column="' + relations[column].column + '"><i class="fas fa-link"></i></i>'
     }
     var tabindex = String(rowIndex) + String(index);
     if (value === null) {
         value = "";
     }
-    var options;
-    if (fields[index].options) {
-        options = fields[index].options.join(",");
-    }
-    return '<span date-type="' + fields[index].type + '" date-options="' + options + '" class="' + classes + '" tabindex="' + tabindex + '">' + Handlebars.Utils.escapeExpression(value) + '</span>' + related;
+    return '<span date-type="' + type + '" date-options="' + options + '" class="' + classes + '" tabindex="' + tabindex + '">' + Handlebars.Utils.escapeExpression(value) + '</span>' + related;
 });
 
 Handlebars.registerHelper('formElement', function(column, record)
