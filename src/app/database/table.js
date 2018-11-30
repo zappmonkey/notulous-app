@@ -139,14 +139,16 @@ app.database.table.structure = function(table, callback)
             field.encoding = results[key].CHARACTER_SET_NAME;
             field.collation = results[key].COLLATION_NAME;
             field.options = undefined;
-            fields[key] = field;
+            field.primary = false;
             if (field.type == 'ENUM') {
                 field.options = field.length.replace(/["']/g, "").split(',');
             }
             if (results[key].COLUMN_KEY.toLowerCase() == 'pri') {
                 primary.index = key;
                 primary.column = field.column;
+                field.primary = true;
             }
+            fields[key] = field;
         }
         structure.primary = primary;
         structure.fields = fields;
@@ -296,6 +298,32 @@ app.database.table.__get = function(data)
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
             });
 
+            $("#workspace .content .table." + data.hash + " .editable tbody tr").not(".header").on("click", function(e) {
+                if (e.shiftKey) {
+                    var row = $(this).parent().find("tr.selected").first();
+                    if (!row) {
+                        $(this).addClass('selected');
+                    }
+                    if (row.data('index') < $(this).data('index')) {
+                        for (var i = row.data('index'); i <= $(this).data('index'); i++) {
+                            $(this).parent().find("tr[data-index=" + i + "]").addClass('selected');
+                        }
+                    } else {
+                        row = $(this).parent().find("tr.selected").last();
+                        for (var i = $(this).data('index'); i <= row.data('index'); i++) {
+                            $(this).parent().find("tr[data-index=" + i + "]").addClass('selected');
+                        }
+                    }
+                } else if (e.ctrlKey || e.metaKey) {
+                    $(this).addClass('selected');
+                } else {
+                    $(this).parent().find("tr.selected").removeClass("selected");
+                    $(this).addClass('selected');
+                }
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
             $("#workspace .content .table." + data.hash + " .editable tbody tr td").on("mouseup", function(e) {
                 $(this).find("span").trigger('focus');
                 e.stopPropagation();
@@ -442,8 +470,8 @@ app.database.table.__get = function(data)
                         field = $(this).parent().data('index');
                         row = $(this).parent().parent().data('index') - 1;
                         break;
-                }
-                if (row && field) {
+                };
+                if (row != undefined && field != undefined) {
                     var nextRow = $("tr[data-index='" + row + "']");
                     if (nextRow.length  == 0) {
                         return;

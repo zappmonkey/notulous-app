@@ -340,6 +340,15 @@ table tr {
     cursor: default;
 }
 
+table.editable tbody tr.selected, table.editable tbody tr.selected:hover {
+    background: #999;
+    color: #fff;
+}
+
+table.editable tr:not(.header):hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
 table tr td, table tr th {
     max-width: 200px;
     overflow: hidden;
@@ -404,10 +413,6 @@ table tr td .has-foreign svg {
 table tr td em {
     color: #bbb;
     font-style: normal;
-}
-
-table.editable tbody tr:not(.header):hover {
-    background: rgba(0, 0, 0, 0.12);
 }
 
 table tr th:after {

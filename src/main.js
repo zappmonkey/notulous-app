@@ -16,7 +16,9 @@ function createWindow ()
         titleBarStyle: 'hiddenInset',
         backgroundColor: '#252525',
         title: "Notulous",
-        show: false
+        show: false,
+        icon: path.join(__dirname, '../assets/icons/notulous.icns')
+        // icon: path.join(__dirname, '../assets/icons/notulous.iconset/icon_64x64.png')
     });
 
     win.once('ready-to-show', () => {

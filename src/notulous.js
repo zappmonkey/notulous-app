@@ -73,7 +73,7 @@ notulous.util.renderTpl = function(tpl, data) {
 };
 
 notulous.util.copyToClipboard = function(text) {
-    var $temp = $("<input>");
+    var $temp = $("<textarea>");
     $("body").append($temp);
     $temp.val(text).select();
     document.execCommand("copy");
@@ -200,10 +200,8 @@ Handlebars.registerHelper('property', function(obj, property, startswith, casein
 Handlebars.registerHelper('recordValue', function(relations, fields, index, rowIndex, value)
 {
     rowIndex++;
-    var classes = "";
-    var related = "";
-    var column, options;
-    var type;
+    var classes = "", related = "", column, options = "", type, primary = "";
+
     if (fields) {
         if (fields[index].options) {
             options = fields[index].options.join(",");
@@ -213,6 +211,7 @@ Handlebars.registerHelper('recordValue', function(relations, fields, index, rowI
         }
         column = fields[index].column;
         type = fields[index].type;
+        primary = fields[index].primary ? " data-primary='true' " : "";
     }
 
     if (relations && column && relations[column]) {
@@ -222,7 +221,7 @@ Handlebars.registerHelper('recordValue', function(relations, fields, index, rowI
     if (value === null) {
         value = "";
     }
-    return '<span date-type="' + type + '" date-options="' + options + '" class="' + classes + '" tabindex="' + tabindex + '">' + Handlebars.Utils.escapeExpression(value) + '</span>' + related;
+    return '<span ' + primary + 'data-type="' + type + '" data-options="' + options + '" class="' + classes + '" tabindex="' + tabindex + '">' + Handlebars.Utils.escapeExpression(value) + '</span>' + related;
 });
 
 Handlebars.registerHelper('formElement', function(column, record)
