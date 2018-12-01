@@ -292,13 +292,13 @@ app.database.table.__get = function(data)
                 );
             });
 
-            $("#workspace .content .table." + data.hash + " tbody tr td .has-foreign").on("click", function(e) {
+            $("#workspace .content .table." + data.hash + " tbody").on("click", "tr td .has-foreign", function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 app.database.table.get($(this).data('table'), undefined, undefined, undefined, $(this).data('column') + " = '" + $(this).parent().text() + "'");
             });
 
-            $("#workspace .content .table." + data.hash + " .editable tbody tr").not(".header").on("click", function(e) {
+            $("#workspace .content .table." + data.hash + " .editable tbody").on("click", "tr:not(.header)", function(e) {
                 if (e.shiftKey) {
                     var row = $(this).parent().find("tr.selected").first();
                     if (!row) {
@@ -324,14 +324,14 @@ app.database.table.__get = function(data)
                 e.preventDefault();
             });
 
-            $("#workspace .content .table." + data.hash + " .editable tbody tr td").on("mouseup", function(e) {
+            $("#workspace .content .table." + data.hash + " .editable tbody").on("mouseup", "tr td", function(e) {
                 $(this).find("span").trigger('focus');
                 e.stopPropagation();
                 e.preventDefault();
             });
 
             var blurredTimeout, blurredRow;
-            $("#workspace .content .table." + data.hash + " tbody tr td span").on('focus', function(e)
+            $("#workspace .content .table." + data.hash + " tbody").on('focus', "tr td span", function(e)
             {
                 if (blurredRow === e.delegateTarget.parentElement.parentElement) {
                     clearTimeout(blurredTimeout);
@@ -398,7 +398,7 @@ app.database.table.__get = function(data)
                 }, 0);
             });
 
-            $("#workspace .content .table." + data.hash + " tbody tr").not(".header").dblclick(function()
+            $("#workspace .content .table." + data.hash + " tbody").on("dblclick", "tr:not(.header)", function()
             {
                 var row = $(this);
                 var index = $(this).data('index');
@@ -458,7 +458,7 @@ app.database.table.__get = function(data)
                 });
             });
 
-            $("#workspace .content .table." + data.hash + " tbody tr td span").on('keydown', function(e)
+            $("#workspace .content .table." + data.hash + " tbody").on('keydown', "tr td span", function(e)
             {
                 var row, field;
                 switch (e.keyCode) {

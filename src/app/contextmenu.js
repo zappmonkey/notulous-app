@@ -1,4 +1,4 @@
-const {remote} = require('electron')
+const {remote} = require('electron');
 const {Menu, MenuItem} = remote
 const path = require('path');
 
@@ -189,14 +189,19 @@ app.contextmenu.selectedRecordTemplate = [{
     id: 'duplicate',
     label: 'Duplicate',
     click: () => {
-        var row = "";
-        app.contextmenu.processItem.find("td").each(function() {
-            if (row != "") {
-                row += "\t";
-            }
-            row += $(this).text();
+        var table = $("table.editable:visible");
+        var row = table.find("tr.selected");
+        var newRow = row.clone();
+        var rowIndex = table.find("tr").length;
+        var previousRowIndex = Number(row.data("index")) + 1;
+        row.removeClass("selected");
+        newRow.find("td span[data-primary='true']").text("");
+        newRow.attr("data-index", rowIndex);
+        newRow.find("td span").each(function() {
+            console.log(previousRowIndex, rowIndex, $(this).attr("tabindex"));
+            $(this).attr("tabindex", $(this).attr("tabindex").replace(previousRowIndex, rowIndex));
         });
-        notulous.util.copyToClipboard(row);
+        newRow.insertAfter(row);
     }
 }];
 app.contextmenu.selectedRecord = Menu.buildFromTemplate(app.contextmenu.selectedRecordTemplate);
