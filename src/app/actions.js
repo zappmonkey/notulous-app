@@ -91,7 +91,6 @@ app.actions.tableFilter = function()
                 $(this).find("[name='value1']").val(),
                 $(this).find("[name='value2']").val()
             );
-            console.log(filter);
         });
         var data = $("#workspace .content .table:visible table").data();
         app.database.table.get(

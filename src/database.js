@@ -108,14 +108,15 @@ database._ssh_config = function(instance)
 database._mysql_config = function(instance)
 {
     var con = {};
-    if (!notulous.util.empty(instance.host)) {
-        con.host = instance.host;
-    }
-    if (!notulous.util.empty(instance.port)) {
-        con.port = instance.port;
-    }
     if (!notulous.util.empty(instance.socket)) {
-        con.socket = instance.socket;
+        con.socketPath = instance.socket;
+    } else {
+        if (!notulous.util.empty(instance.host)) {
+            con.host = instance.host;
+        }
+        if (!notulous.util.empty(instance.port)) {
+            con.port = instance.port;
+        }
     }
     if (!notulous.util.empty(instance.username)) {
         con.user = instance.username;

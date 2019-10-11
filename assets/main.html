@@ -475,8 +475,16 @@
                     <input type="text" name="name" value="{{instance.name}}" placeholder="optional"/>
                 </label>
                 <label>
+                    <span>Socket</span>
+                    <input type="text" name="socket" value="{{instance.socket}}"/>
+                </label>
+                <label>
                     <span>Host</span>
-                    <input type="text" name="host" value="{{instance.host}}" required="true"/>
+                    <input type="text" name="host" value="{{instance.host}}"/>
+                </label>
+                <label>
+                    <span>Port</span>
+                    <input type="text" name="port" value="{{instance.port}}" placeholder="3306" data-default="3306"/>
                 </label>
                 <label>
                     <span>User</span>
@@ -489,10 +497,6 @@
                 <label>
                     <span>Database</span>
                     <input type="text" name="database" value="{{instance.database}}" placeholder="optional"/>
-                </label>
-                <label>
-                    <span>Port</span>
-                    <input type="text" name="port" value="{{instance.port}}" placeholder="3306" data-default="3306"/>
                 </label>
                 <label class="color">
                     <span>Color</span>

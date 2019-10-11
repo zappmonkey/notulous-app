@@ -154,7 +154,6 @@ body #list label, body #workspace label {
 
 body #workspace label {
     text-align: left;
-    width: 100px;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -617,7 +616,7 @@ body #workspace .content .filters .actions .save {
 body #workspace .content .filters .select, body #workspace .content .filters input {
     display: inline-block;
     position: relative;
-    width: 140px;
+    min-width: 180px;
 }
 
 body #workspace .content .filters .select select {
@@ -626,7 +625,7 @@ body #workspace .content .filters .select select {
     border: 1px solid #ccc;
     border-radius: 0px;
     background: none;
-    min-width: 140px;
+    width: 100%;
     position: relative;
     z-index: 2;
 }

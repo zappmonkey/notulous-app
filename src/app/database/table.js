@@ -256,8 +256,9 @@ app.database.table.__get = function(data)
             var html = $("#workspace .content .table:visible .filters").length > 0 ? $("#workspace .content .table:visible .filters").html().trim() : undefined;
             if (data.filter && filters > 0 && html != "") {
                 filterHTML = $("#workspace .content .table:visible .filters").clone();
-                filterHTML.find("[name=field]").val($("#workspace .content .table:visible .filters [name=field]").val());
-                filterHTML.find("[name=filter]").val($("#workspace .content .table:visible .filters [name=filter]").val());
+                $("#workspace .content .table:visible .filters").find("select").each(function(i) {
+                    $(filterHTML).find("select").eq(i).val($(this).val());
+                });
             }
             data.transposed = app.database.table.transposed();
             data.relations = app.database.table.__structure[data.table].relations;
