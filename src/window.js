@@ -62,8 +62,6 @@ ipcRenderer.on('next-query', function() {
     app.view.nextQuery();
 });
 
-ipcRende
-
 ipcRenderer.on('run-queries', function() {
     if ($("#workspace .buttons.terminal").is(":visible")) {
         $("#workspace .buttons.terminal .run").trigger("click");
