@@ -11,9 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
-    "@fortawesome/fontawesome-free-brands": "^5.0.13",
-    "@fortawesome/fontawesome-free-regular": "^5.0.13",
-    "@fortawesome/fontawesome-free-solid": "^5.0.13",
+    "@fortawesome/fontawesome-free-brands": "^5.*",
+    "@fortawesome/fontawesome-free-regular": "^5.*",
+    "@fortawesome/fontawesome-free-solid": "^5.*",
     "codemirror": "^5.40.2",
     "handlebars": "^4.*",
     "jquery": "^3.*",

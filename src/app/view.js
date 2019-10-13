@@ -137,6 +137,38 @@ app.view.checkQueryNavigation = function()
     }
 };
 
+app.view.previousQuery = function()
+{
+    if ($('#workspace .top .buttons.table .previous').is(":visible") && app.session.hasPrevious()) {
+        var item = app.session.getPrevious();
+        switch (item.type) {
+            case 'table':
+                app.view.setTableName(item.data.table);
+                app.database.table.__get(item.data);
+                break;
+            default:
+                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+                break;
+        }
+    }
+};
+
+app.view.nextQuery = function()
+{
+    if ($('#workspace .top .buttons.table .next').is(":visible") && app.session.hasNext()) {
+        var item = app.session.getNext();
+        switch (item.type) {
+            case 'table':
+                app.view.setTableName(item.data.table);
+                app.database.table.__get(item.data);
+                break;
+            default:
+                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
+                break;
+        }
+    }
+};
+
 app.view.modal = app.view.modal || {
     __on_modal_close: undefined
 };

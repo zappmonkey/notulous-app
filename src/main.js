@@ -140,6 +140,21 @@ function createMenu()
         label: 'Table',
         submenu: [
             {
+                label: 'Previous',
+                accelerator: 'CmdOrCtrl+,',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('previous-query');
+                }
+            },
+            {
+                label: 'Next',
+                accelerator: 'CmdOrCtrl+.',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('next-query');
+                }
+            },
+            {type: 'separator'},
+            {
                 label: 'Filter',
                 accelerator: 'CmdOrCtrl+F',
                 click (menuItem, currentWindow) {
@@ -292,6 +307,8 @@ function createMenu()
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
 };
+
+app.disableHardwareAcceleration();
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

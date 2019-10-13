@@ -234,61 +234,43 @@ app.actions.topMenus = function() {
         app.actions.tableFilter();
     });
 
-    $('#workspace .top .buttons.table .previous').on('click', function(e) {
+    $('#workspace .top .buttons.table .previous').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var item = app.session.getPrevious();
-        switch (item.type) {
-            case 'table':
-                app.view.setTableName(item.data.table);
-                app.database.table.__get(item.data);
-                break;
-            default:
-                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
-                break;
-        }
+        app.view.previousQuery();
      });
 
-    $('#workspace .top .buttons.table .next').on('click', function(e) {
+    $('#workspace .top .buttons.table .next').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var item = app.session.getNext();
-        switch (item.type) {
-            case 'table':
-                app.view.setTableName(item.data.table);
-                app.database.table.__get(item.data);
-                break;
-            default:
-                app.instance.customQuery(item.data.query, item.data.sort, item.data.order);
-                break;
-        }
+        app.view.nextQuery();
     });
 
-    $('#workspace .top .buttons.table .refresh').on('click', function(e) {
+    $('#workspace .top .buttons.table .refresh').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
         app.database.table.refresh();
     });
 
-    $('#workspace .top .buttons.table .info').on('click', function(e) {
+    $('#workspace .top .buttons.table .info').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
         app.database.table.info();
     });
 
-    $('#workspace .top .buttons.table .structure').on('click', function(e) {
+    $('#workspace .top .buttons.table .structure').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
         app.database.table.structure();
     });
 
-    $('#workspace .top .buttons.table .transpose').on('click', function(e) {
+    $('#workspace .top .buttons.table .transpose').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
         app.database.table.transpose();
     });
 
-    $('#workspace .top .buttons.terminal .run').on('click', function(e) {
+    $('#workspace .top .buttons.terminal .run').on('mouseup', function(e) {
         e.preventDefault();
         e.stopPropagation();
 

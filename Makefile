@@ -1,0 +1,4 @@
+phony: run
+
+run:
+	electron .
