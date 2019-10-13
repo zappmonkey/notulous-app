@@ -62,8 +62,6 @@ ipcRenderer.on('next-query', function() {
     app.view.nextQuery();
 });
 
-ipcRende
-
 ipcRenderer.on('run-queries', function() {
     if ($("#workspace .buttons.terminal").is(":visible")) {
         $("#workspace .buttons.terminal .run").trigger("click");
@@ -72,6 +70,10 @@ ipcRenderer.on('run-queries', function() {
 
 ipcRenderer.on('add-instance', function() {
     app.instance.add();
+});
+
+ipcRenderer.on('close-instance', function() {
+    app.instance.close();
 });
 
 ipcRenderer.on('show-processlist', function() {

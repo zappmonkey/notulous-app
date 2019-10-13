@@ -77,6 +77,44 @@ input[type=radio] {
     border-bottom: none;
 }
 
+#menu .databases-but {
+    display: none;
+}
+
+#menu .tag {
+    display: none;
+    float: right;
+    padding: 2px 5px;
+    width: 50px;
+    margin: 11px 4px;
+    font-size: 10px;
+    text-align: center;
+    background: #090;
+    border-radius: 1px;
+    text-transform: uppercase;
+    text-shadow: 0px 1px 1px rgba(0,0,0,0.8);
+}
+
+body[environment="local"] #menu .tag.local {
+    display: inline-block;
+    background: #2a7525;
+}
+
+body[environment="development"] #menu .tag.development {
+    display: inline-block;
+    background: #aa9a17;
+}
+
+body[environment="acceptation"] #menu .tag.acceptation {
+    display: inline-block;
+    background: #a50;
+}
+
+body[environment="production"] #menu .tag.production {
+    display: inline-block;
+    background: #a00;
+}
+
 #menu .instance {
     padding: 5px 20px;
     font-weight: bold;
@@ -122,7 +160,7 @@ body #menu {
 .button, .spacer {
     display: inline-block;
     padding: 12px 6px;
-    width: 30px;
+    width: 28px;
     text-align: center;
     color: #fff;
     opacity: 0.5;

@@ -106,6 +106,13 @@ function createMenu()
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('add-instance');
                 }
+            },
+            {
+                label: 'Close instance',
+                accelerator: 'CmdOrCtrl+Alt+W',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('close-instance');
+                }
             }
         ]
     },
@@ -308,7 +315,7 @@ function createMenu()
     Menu.setApplicationMenu(menu)
 };
 
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

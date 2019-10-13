@@ -7,6 +7,14 @@ app.instance = {
     __lastCustomQuery: undefined
 };
 
+app.instance.reset = function()
+{
+    app.instance.__selected = undefined;
+    app.instance.__selected_data = undefined;
+    app.instance.__instances = undefined;
+    app.instance.__lastCustomQuery = undefined;
+};
+
 app.instance.getSelected = function()
 {
     return app.instance.__selected;
@@ -90,7 +98,7 @@ app.instance.add = function(instanceData)
     $("#modal .save").on("click", function() {
         var data = {};
         var save = true;
-        $("#modal input[type=hidden], #modal input[type=radio]:checked, #modal input[type=text]:visible, #modal input[type=password]:visible").each(function() {
+        $("#modal input[type=hidden], #modal input[type=radio]:checked, #modal input[type=text]:visible, #modal input[type=password]:visible, #modal select").each(function() {
             data[$(this).attr('name')] = $(this).val();
             if (data[$(this).attr('name')] == "") {
                 data[$(this).attr('name')] = $(this).data("default");
@@ -166,6 +174,9 @@ app.instance.set = function(instance)
     var config = app.instance.getConfig(instance);
     // clear all
     app.database.__selected = undefined;
+    $("body").attr("environment", "");
+    $("body").attr("environment", config.environment);
+    $("#menu .databases-but").css("display", "inline-block");
     $('#menu .databases li.active').removeClass('active');
     $("#list .content").html("");
     $("#list .top label").html("");
@@ -185,6 +196,14 @@ app.instance.set = function(instance)
         };
         app.instance.databases(config.database);
     }, true);
+};
+
+app.instance.close = function() {
+    database.closeAll();
+    app.instance.reset();
+    $("#menu .databases-but").hide();
+    $('#menu .top .button.instances-but').trigger('click');
+    $("body").attr("environment", "");
 };
 
 app.instance.databases = function(database)
@@ -291,7 +310,6 @@ app.instance.kill = function(id) {
 app.instance.killConnection = function(id) {
     app.instance.query("KILL CONNECTION " + id + ";");
 };
-
 
 app.instance.query = function(query, callback)
 {

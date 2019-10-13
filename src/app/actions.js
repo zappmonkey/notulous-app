@@ -217,6 +217,7 @@ app.actions.topMenus = function() {
     $('#workspace .top .buttons.table .filter').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
+        $('#workspace .top .database .table').trigger('click');
         if ($("#workspace .content .table:visible .filters").length <= 0) {
             return;
         }

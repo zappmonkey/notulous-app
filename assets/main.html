@@ -15,9 +15,13 @@
             </div>
             <div class="top">
                 <div class="buttons">
-                    <div class="button instances-but active"><i class="fas fa-server"></i></div>
                     <div class="button databases-but"><i class="fas fa-database"></i></div>
+                    <div class="button instances-but active"><i class="fas fa-server"></i></div>
                 </div>
+                <div class="tag local">local</div>
+                <div class="tag development">dev</div>
+                <div class="tag acceptation">acc</div>
+                <div class="tag production">prod</div>
             </div>
             <div class="content"></div>
         </div>
@@ -44,6 +48,7 @@
                     <a class="button info"><i class="fas fa-info"></i></a>
                     <a class="button refresh"><i class="fas fa-sync-alt"></i></a>
                     <a class="button transpose"><i class="fas fa-retweet"></i></a>
+                    <div class="spacer"></div>
                     <a class="button previous"><i class="fas fa-chevron-left"></i></a>
                     <a class="button next"><i class="fas fa-chevron-right"></i></a>
                 </div>
@@ -456,7 +461,7 @@
 <div id="overlay">
     <div class="overlay-bg"></div>
     <div id="modal">
-        <div class="title">Add instance</div>
+        <div class="title">{{#if instance}}Edit{{else}}Add{{/if}} instance{{#if instance}} | {{instance.name}}{{/if}}</div>
         <div class="content">
             <div class="mysql">
                 <input type="hidden" name="key" value="{{instance.key}}"/>
@@ -496,6 +501,16 @@
                 <label>
                     <span>Database</span>
                     <input type="text" name="database" value="{{instance.database}}" placeholder="optional"/>
+                </label>
+                <label>
+                    <span>Environment</span>
+                    <select name="environment">
+                        <option value="">None</option>
+                        <option value="local"{{#ifEq instance.environment 'local'}} selected="selected"{{/ifEq}}>Local</option>
+                        <option value="development"{{#ifEq instance.environment 'development'}} selected="selected"{{/ifEq}}>Development</option>
+                        <option value="acceptation"{{#ifEq instance.environment 'acceptation'}} selected="selected"{{/ifEq}}>Acceptation</option>
+                        <option value="production"{{#ifEq instance.environment 'production'}} selected="selected"{{/ifEq}}>Production</option>
+                    </select>
                 </label>
                 <label class="color">
                     <span>Color</span>
