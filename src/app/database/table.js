@@ -213,6 +213,22 @@ app.database.table.transposed = function()
     return $("#workspace .top .buttons.table .transpose").hasClass("active");
 };
 
+app.database.table.transpose = function()
+{
+    if ($("#workspace .content .table:visible").length <= 0) {
+        return;
+    }
+    if ($("#workspace .content .table:visible").hasClass("transpose")) {
+        $("#workspace .content .table:visible").removeClass("transpose");
+        $('#workspace .top .buttons.table .transpose').removeClass('active');
+    } else {
+        $("#workspace .content .table:visible").addClass("transpose");
+        if (!$("#workspace .top .buttons.table .transpose").hasClass("active")) {
+            $('#workspace .top .buttons.table .transpose').addClass('active');
+        }
+    }
+};
+
 app.database.table.columns = function(table, force)
 {
     if (!force && app.database.table.__columns[table]) {

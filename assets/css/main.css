@@ -156,6 +156,7 @@ body #workspace label {
     text-align: left;
     white-space: nowrap;
     text-overflow: ellipsis;
+    min-width: 180px;
 }
 
 body #list label svg, body #workspace label svg {

@@ -149,6 +149,27 @@ function createMenu()
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('table-reload');
                 }
+            },
+            {
+                label: 'Transpose',
+                accelerator: 'CmdOrCtrl+Alt+T',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-transpose');
+                }
+            },
+            {
+                label: 'Transpose',
+                accelerator: 'CmdOrCtrl+Alt+I',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-info');
+                }
+            },
+            {
+                label: 'Transpose',
+                accelerator: 'CmdOrCtrl+Alt+S',
+                click (menuItem, currentWindow) {
+                    currentWindow.webContents.send('table-structure');
+                }
             }
         ]
     },

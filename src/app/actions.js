@@ -151,7 +151,7 @@ app.actions.workspace = function() {
 };
 
 app.actions.topMenus = function() {
-    $(".top").on("dblclick", function(e) {
+    $("#list .top, #menu .top").on("dblclick", function(e) {
         e.preventDefault();
         e.stopPropagation();
         remote.getCurrentWindow().maximize();
@@ -234,7 +234,7 @@ app.actions.topMenus = function() {
         app.actions.tableFilter();
     });
 
-    $('#workspace .top .previous').on('click', function(e) {
+    $('#workspace .top .buttons.table .previous').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         var item = app.session.getPrevious();
@@ -249,7 +249,7 @@ app.actions.topMenus = function() {
         }
      });
 
-    $('#workspace .top .next').on('click', function(e) {
+    $('#workspace .top .buttons.table .next').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         var item = app.session.getNext();
@@ -283,18 +283,9 @@ app.actions.topMenus = function() {
     });
 
     $('#workspace .top .buttons.table .transpose').on('click', function(e) {
-        if ($("#workspace .content .table:visible").length <= 0) {
-            return;
-        }
         e.preventDefault();
         e.stopPropagation();
-        if ($("#workspace .content .table:visible").hasClass("transpose")) {
-            $("#workspace .content .table:visible").removeClass("transpose");
-            $('#workspace .top .buttons.table .transpose').removeClass('active');
-        } else {
-            $("#workspace .content .table:visible").addClass("transpose");
-            $('#workspace .top .buttons.table .transpose').addClass('active');
-        }
+        app.database.table.transpose();
     });
 
     $('#workspace .top .buttons.terminal .run').on('click', function(e) {
@@ -309,7 +300,7 @@ app.actions.topMenus = function() {
         $("#workspace .container").hide();
         $(document).on("mouseup", function(e) {
             $(document).off("mousemove");
-            $(document).off("mousup");
+            $(document).off("mouseup");
             var sizes = {
                 menu: $("#menu").width(),
                 list: $("#list").width()
@@ -334,7 +325,7 @@ app.actions.terminal = function() {
         $("#workspace .container").hide();
         $(document).on("mouseup", function(e) {
             $(document).off("mousemove");
-            $(document).off("mousup");
+            $(document).off("mouseup");
             var sizes = {
                 editor: $("#workspace .terminal .editor-container").height(),
                 results: $("#workspace .terminal .results").height()

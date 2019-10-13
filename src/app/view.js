@@ -126,14 +126,14 @@ app.view.getAndRunCustomQuery = function() {
 app.view.checkQueryNavigation = function()
 {
     if (app.session.hasNext()) {
-        $("#workspace .top .next").show();
+        $("#workspace .top .next").visible();
     } else {
-        $("#workspace .top .next").hide();
+        $("#workspace .top .next").invisible();
     }
     if (app.session.hasPrevious()) {
-        $("#workspace .top .previous").show();
+        $("#workspace .top .previous").visible();
     } else {
-        $("#workspace .top .previous").hide();
+        $("#workspace .top .previous").invisible();
     }
 };
 

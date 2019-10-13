@@ -44,7 +44,7 @@ app.session.getPrevious = function()
     if (app.session.index > app.session.store.length - 1) {
         app.session.index = app.session.store.length - 1;
     }
-    app.session.allow = false;
+    app.session.allow = false
     return app.session.store[app.session.index];
 };
 

@@ -42,6 +42,18 @@ ipcRenderer.on('table-reload', function() {
     app.database.table.refresh();
 });
 
+ipcRenderer.on('table-transpose', function() {
+    app.database.table.refresh();
+});
+
+ipcRenderer.on('table-info', function() {
+    app.database.table.info();
+});
+
+ipcRenderer.on('table-structure', function() {
+    app.database.table.structure();
+});
+
 ipcRenderer.on('run-queries', function() {
     if ($("#workspace .buttons.terminal").is(":visible")) {
         $("#workspace .buttons.terminal .run").trigger("click");
