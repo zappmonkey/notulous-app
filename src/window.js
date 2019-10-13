@@ -43,7 +43,7 @@ ipcRenderer.on('table-reload', function() {
 });
 
 ipcRenderer.on('table-transpose', function() {
-    app.database.table.refresh();
+    app.database.table.transpose();
 });
 
 ipcRenderer.on('table-info', function() {

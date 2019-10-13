@@ -17,8 +17,11 @@ function createWindow ()
         backgroundColor: '#252525',
         title: "Notulous",
         show: false,
-        icon: path.join(__dirname, '../assets/icons/notulous.icns')
-        // icon: path.join(__dirname, '../assets/icons/notulous.iconset/icon_64x64.png')
+        icon: path.join(__dirname, '../assets/icons/notulous.icns'),
+        webPreferences: {
+            nodeIntegration: true,
+            nodeIntegrationInWorker: true
+        }
     });
 
     win.once('ready-to-show', () => {
@@ -158,14 +161,14 @@ function createMenu()
                 }
             },
             {
-                label: 'Transpose',
+                label: 'Info',
                 accelerator: 'CmdOrCtrl+Alt+I',
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('table-info');
                 }
             },
             {
-                label: 'Transpose',
+                label: 'Structure',
                 accelerator: 'CmdOrCtrl+Alt+S',
                 click (menuItem, currentWindow) {
                     currentWindow.webContents.send('table-structure');

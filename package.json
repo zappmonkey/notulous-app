@@ -15,12 +15,12 @@
     "@fortawesome/fontawesome-free-regular": "^5.0.13",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "codemirror": "^5.40.2",
-    "handlebars": "^4.0.12",
-    "jquery": "^3.3.1",
+    "handlebars": "^4.*",
+    "jquery": "^3.*",
     "moment": "^2.22.2",
     "mysql-ssh": "^1.0.6"
   },
   "devDependencies": {
-    "electron": "^4.0.0-beta.4"
+    "electron": "^6.*"
   }
 }

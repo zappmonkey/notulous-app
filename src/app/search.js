@@ -13,7 +13,7 @@ app.search.all = function()
     $("#search-all input").focus();
 
     $("#search-all input").on('blur', function() {
-        $("#search-all").remove();
+        // $("#search-all").remove();
     });
 
     $("#search-all input").on('keydown', function(e) {
