@@ -421,7 +421,7 @@ app.database.table.__get = function(data)
                 var index = $(this).data('index');
                 var table = $(this).closest("table").data("table");
                 var data = {
-                    maxheight: $(window).height()-250,
+                    maxheight: $(window).height()-280,
                     index: index,
                     table: table,
                     primary: app.database.table.__structure[table].primary,

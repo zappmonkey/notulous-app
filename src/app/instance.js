@@ -76,7 +76,10 @@ app.instance.duplicate = function(instance)
 app.instance.add = function(instanceData)
 {
     $("body").append(
-        notulous.util.renderTpl("instance-add", {instance: instanceData})
+        notulous.util.renderTpl("instance-add", {
+            instance: instanceData,
+            maxheight: $(window).height()-280,
+        })
     );
     $("#overlay .overlay-bg, #modal .close").on("click", function() {
         $("#overlay").remove();

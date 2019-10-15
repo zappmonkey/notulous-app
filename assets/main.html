@@ -462,7 +462,7 @@
     <div class="overlay-bg"></div>
     <div id="modal">
         <div class="title">{{#if instance}}Edit{{else}}Add{{/if}} instance{{#if instance}} | {{instance.name}}{{/if}}</div>
-        <div class="content">
+        <div class="content" style="max-height:{{maxheight}}px">
             <div class="mysql">
                 <input type="hidden" name="key" value="{{instance.key}}"/>
                 <input type="hidden" name="hash" value="{{instance.hash}}"/>
