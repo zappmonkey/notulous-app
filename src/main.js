@@ -20,6 +20,7 @@ function createWindow ()
         icon: path.join(__dirname, '../assets/icons/notulous.icns'),
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
             nodeIntegrationInWorker: true
         }
     });
